@@ -1,0 +1,33 @@
+CC = i386-mingw32msvc-gcc
+CFLAGS = -O3 -mcpu=pentium3 -Iwin \
+         -ffast-math -funroll-loops -fomit-frame-pointer
+#CFLAGS = -DUSE_GTK `gtk-config --cflags` -g -fPIC
+CXX = i386-mingw32msvc-g++
+CXXFLAGS = $(CFLAGS)
+LD = i386-mingw32msvc-g++
+LDFLAGS =
+STRIP = i386-mingw32msvc-strip
+
+TARGET = mupen64_hle_rsp_azimer.dll
+OBJECTS = main.o disasm.o jpeg.o ucode1.o ucode2.o ucode3.o ucode3mp3.o \
+          win/Config.o win/win.o
+
+all:	$(TARGET) instruction
+
+$(TARGET): $(OBJECTS)
+	$(LD) -shared -fPIC -Wl,-Bsymbolic,--output-def,testdll.def,--out-implib,libtestdll.a $(LDFLAGS) -o $@ $(OBJECTS)
+	$(STRIP) --strip-all $@
+
+instruction:
+	$(warning please copy $(TARGET) in the plugins/ folder of the emulator)
+
+#.o: .c
+#	$(CC) $(CFLAGS) -o $@ $<
+
+#.o: .cpp
+#	$(CXX) $(CXXFLAGS) -o $@ $<
+
+clean:
+	rm -rf $(OBJECTS) $(ALL)
+
+rebuild: clean $(ALL)
