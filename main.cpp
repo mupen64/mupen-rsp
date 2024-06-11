@@ -32,14 +32,17 @@ __declspec(dllexport) void DllAbout ( HWND hParent )
 
 __declspec(dllexport) void DllConfig ( HWND hParent )
 {
-	if (firstTime)
-		DialogBox(dll_hInstance,
-						 MAKEINTRESOURCE(IDD_RSPCONFIG), hParent, ConfigDlgProc);
+	if (!firstTime)
+	{
+		MessageBox(NULL, "Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, MB_OK);
+		return;
+	}
+	
+	DialogBox(dll_hInstance, MAKEINTRESOURCE(IDD_RSPCONFIG), hParent, ConfigDlgProc);
 }
 
 __declspec(dllexport) void DllTest ( HWND hParent )
 {
-	MessageBox(NULL, "no test", "no test", MB_OK);
 }
 
 static int audio_ucode_detect(OSTask_t *task)
