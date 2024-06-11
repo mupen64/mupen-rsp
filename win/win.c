@@ -1,6 +1,9 @@
 #include <windows.h>
-#include <dirent.h>
 #include "win.h"
+
+#include <stdio.h>
+
+#include "Config.h"
 #include "../Rsp_#1.1.h"
 #include "../Audio_#1.1.h"
 #include "../winproject/resource.h"
@@ -97,27 +100,27 @@ char* getExtension(char *str)
 
 void search_plugins()
 {
-    DIR *dir;
+    WIN32_FIND_DATA fd;
+    HANDLE hFind;
     char cwd[MAX_PATH];
     char name[MAX_PATH];
-    struct dirent *entry;
    
     liste_plugins = malloc(sizeof(plugins));
     liste_plugins->type = -1;
     liste_plugins->next = NULL;
     
     sprintf(cwd, AppPath);
-    
-    dir = opendir(cwd);
-    while((entry = readdir(dir)) != NULL)
+
+    hFind = FindFirstFile(cwd, &fd);
+    while(FindNextFile(hFind, &fd))
     {
         HMODULE handle;
-       
+        
         strcpy(name, cwd);
         strcat(name, "\\");
-        strcat(name, entry->d_name);
+        strcat(name, fd.cFileName);
        
-        if (getExtension(entry->d_name) != NULL && strcmp(getExtension(entry->d_name),"dll")==0) {
+        if (getExtension(fd.cFileName) != NULL && strcmp(getExtension(fd.cFileName),"dll")==0) {
         handle = LoadLibrary(name);
         if (handle)
         {
