@@ -78,6 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -95,6 +96,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,15 +141,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="../main.c"/>
-    <ClCompile Include="../disasm.c"/>
-    <ClCompile Include="../jpeg.c"/>
+    <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\disasm.cpp" />
+    <ClCompile Include="..\jpeg.cpp" />
     <ClCompile Include="../ucode1.cpp"/>
     <ClCompile Include="../ucode2.cpp"/>
     <ClCompile Include="../ucode3.cpp"/>
     <ClCompile Include="../ucode3mp3.cpp"/>
-    <ClCompile Include="../win/Config.c"/>
-    <ClCompile Include="../win/win.c"/>
+    <ClCompile Include="..\win\Config.cpp" />
+    <ClCompile Include="..\win\win.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../Rsp_#1.1.h"/>

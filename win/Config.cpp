@@ -1,5 +1,8 @@
 #include <windows.h>
 #include "Config.h"
+
+#include <cstdio>
+
 #include "win.h"
 
 #define CfgFileName "mupen64_rsp_hle.cfg"
@@ -12,7 +15,7 @@ char *CfgFilePath()
    static char *cfgpath = NULL;
    if (cfgpath == NULL)
      {
-       	cfgpath = malloc(strlen(AppPath)+1+strlen(CfgFileName));
+       	cfgpath = (char*)malloc(strlen(AppPath)+1+strlen(CfgFileName));
 	    strcpy(cfgpath, AppPath);
     	strcat(cfgpath, CfgFileName);
      }
@@ -20,13 +23,13 @@ char *CfgFilePath()
 }
 
 
-void WriteCfgString   (char *Section,char *Key,char *Value) 
+void WriteCfgString   (const char *Section,const char *Key,char *Value) 
 {
     WritePrivateProfileString( Section, Key, Value, CfgFilePath());
 }
 
 
-void WriteCfgInt      (char *Section,char *Key,int Value) 
+void WriteCfgInt      (const char *Section,const char *Key,int Value) 
 {
     static char TempStr[100];
     sprintf(TempStr,"%d",Value);
@@ -34,13 +37,13 @@ void WriteCfgInt      (char *Section,char *Key,int Value)
 }
 
 
-void ReadCfgString    (char *Section,char *Key,char *DefaultValue,char *retValue) 
+void ReadCfgString    (const char *Section,const char *Key,const char *DefaultValue,char *retValue) 
 {
     GetPrivateProfileString( Section, Key, DefaultValue, retValue, 100, CfgFilePath());
 }
 
 
-int ReadCfgInt        (char *Section,char *Key,int DefaultValue) 
+int ReadCfgInt        (const char *Section,const char *Key,int DefaultValue) 
 {
     return GetPrivateProfileInt( Section, Key, DefaultValue, CfgFilePath());
 }
