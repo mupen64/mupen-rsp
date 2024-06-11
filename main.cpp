@@ -15,6 +15,8 @@
 
 #include "Audio_#1.1.h"
 
+#define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.2.1"
+
 RSP_INFO rsp;
 
 BOOL AudioHle = FALSE, GraphicsHle = TRUE, SpecificHle = FALSE;
@@ -33,15 +35,16 @@ __declspec(dllexport) void CloseDLL (void)
 
 __declspec(dllexport) void DllAbout ( HWND hParent )
 {
+	auto message = "Made using Azimer's code by Hacktarux.\r\nMaintained by Aurumaker72\r\nhttps://github.com/Aurumaker72/hacktarux-azimer-rsp-hle";
 #ifdef __WIN32__
-   MessageBox(NULL, "Mupen64 HLE RSP plugin v0.2 with Azimers code by Hacktarux", "RSP HLE", MB_OK);
+   MessageBox(NULL, message, PLUGIN_NAME, MB_OK);
 #else
 #ifdef USE_GTK
    char tMsg[256];
    GtkWidget *dialog, *label, *okay_button;
 
    dialog = gtk_dialog_new();
-   sprintf(tMsg,"Mupen64 HLE RSP plugin v0.2 with Azimers code by Hacktarux");
+   sprintf(tMsg,message);
    label = gtk_label_new(tMsg);
    okay_button = gtk_button_new_with_label("OK");
 
@@ -57,7 +60,7 @@ __declspec(dllexport) void DllAbout ( HWND hParent )
    gtk_widget_show_all(dialog);
 #else
    char tMsg[256];
-   sprintf(tMsg,"Mupen64 HLE RSP plugin v0.2 with Azimers code by Hacktarux");
+   sprintf(tMsg,message);
    fprintf(stderr, "About\n%s\n", tMsg);
 #endif
 #endif
@@ -315,7 +318,7 @@ __declspec(dllexport) void GetDllInfo ( PLUGIN_INFO * PluginInfo )
 {
    PluginInfo->Version = 0x0101;
    PluginInfo->Type = PLUGIN_TYPE_RSP;
-   strcpy(PluginInfo->Name, "Hacktarux/Azimer hle rsp plugin");
+   strcpy(PluginInfo->Name, PLUGIN_NAME);
    PluginInfo->NormalMemory = TRUE;
    PluginInfo->MemoryBswaped = TRUE;
 }
