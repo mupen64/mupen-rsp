@@ -27,11 +27,7 @@
  *
 **/
 
-#ifdef __WIN32__
 #include <windows.h>
-#else
-#include "wintypes.h"
-#endif
 #include <stdio.h>
 
 #include "Rsp_#1.1.h"
@@ -80,11 +76,7 @@ void jpg_uncompress(OSTask_t *task)
      }
    else
      {
-#ifdef __WIN32__
 	MessageBox(NULL, "!flags", "!flags", MB_OK);
-#else
-	printf("!flags\n");
-#endif
      }
    pic = (short*)(rsp.RDRAM + jpg_data.pic);
 

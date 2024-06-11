@@ -1,13 +1,6 @@
-#ifdef __WIN32__
 #include <windows.h>
 #include "./winproject/resource.h"
 #include "./win/win.h"
-#else
-#ifdef USE_GTK
-#include <gtk/gtk.h>
-#endif
-#include "wintypes.h"
-#endif
 #include <stdio.h>
 
 #include "Rsp_#1.1.h"
@@ -21,11 +14,9 @@ RSP_INFO rsp;
 
 BOOL AudioHle = FALSE, GraphicsHle = TRUE, SpecificHle = FALSE;
 
-#ifdef __WIN32__
 extern void (*processAList)();
 static BOOL firstTime = TRUE;
 void loadPlugin();
-#endif
 
 void disasm(FILE *f, unsigned long t[0x1000/4]);
 
@@ -36,51 +27,19 @@ __declspec(dllexport) void CloseDLL (void)
 __declspec(dllexport) void DllAbout ( HWND hParent )
 {
 	auto message = "Made using Azimer's code by Hacktarux.\r\nMaintained by Aurumaker72\r\nhttps://github.com/Aurumaker72/hacktarux-azimer-rsp-hle";
-#ifdef __WIN32__
-   MessageBox(NULL, message, PLUGIN_NAME, MB_OK);
-#else
-#ifdef USE_GTK
-   char tMsg[256];
-   GtkWidget *dialog, *label, *okay_button;
-
-   dialog = gtk_dialog_new();
-   sprintf(tMsg,message);
-   label = gtk_label_new(tMsg);
-   okay_button = gtk_button_new_with_label("OK");
-
-   gtk_signal_connect_object(GTK_OBJECT(okay_button), "clicked",
-			     GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			     GTK_OBJECT(dialog));
-   gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->action_area),
-		     okay_button);
-
-   gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
-		     label);
-   gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-   gtk_widget_show_all(dialog);
-#else
-   char tMsg[256];
-   sprintf(tMsg,message);
-   fprintf(stderr, "About\n%s\n", tMsg);
-#endif
-#endif
+	MessageBox(NULL, message, PLUGIN_NAME, MB_OK);
 }
 
 __declspec(dllexport) void DllConfig ( HWND hParent )
 {
-#ifdef __WIN32__
-    if (firstTime)
-    DialogBox(dll_hInstance,
-                     MAKEINTRESOURCE(IDD_RSPCONFIG), hParent, ConfigDlgProc);
-   //MessageBox(NULL, "no config", "noconfig", MB_OK);
-#endif
+	if (firstTime)
+		DialogBox(dll_hInstance,
+						 MAKEINTRESOURCE(IDD_RSPCONFIG), hParent, ConfigDlgProc);
 }
 
 __declspec(dllexport) void DllTest ( HWND hParent )
 {
-#ifdef __WIN32__
-   MessageBox(NULL, "no test", "no test", MB_OK);
-#endif
+	MessageBox(NULL, "no test", "no test", MB_OK);
 }
 
 static int audio_ucode_detect(OSTask_t *task)
@@ -129,11 +88,8 @@ static int audio_ucode(OSTask_t *task)
 		{
 /*		char s[1024];
 		sprintf(s, "unknown audio\n\tsum:%x", sum);
-#ifdef __WIN32__
 		MessageBox(NULL, s, "unknown task", MB_OK);
-#else
-		printf("%s\n", s);
-#endif*/
+*/
 		return -1;
 		}
 	}
@@ -154,14 +110,13 @@ __declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles )
 {
    OSTask_t *task = (OSTask_t*)(rsp.DMEM + 0xFC0);
    unsigned int i, sum=0;
-#ifdef __WIN32__
-   if(firstTime)
+
+	if(firstTime)
    {
       firstTime=FALSE;
       if (SpecificHle)
             loadPlugin();
    }
-#endif
 
    if( task->type == 1 && task->data_ptr != 0 && GraphicsHle) {
       if (rsp.ProcessDlistList != NULL) {
@@ -176,11 +131,9 @@ __declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles )
       *rsp.DPC_STATUS_REG &= ~0x0002;
       return Cycles;
    } else if (task->type == 2 && AudioHle) {
-#ifdef __WIN32__
       if (SpecificHle)
             processAList();
       else
-#endif
       if (rsp.ProcessAlistList != NULL) {
 	 rsp.ProcessAlistList();
       }
@@ -258,11 +211,7 @@ __declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles )
 		    {
 		       char s[1024];
 		       sprintf(s, "unknown jpeg:\n\tsum:%x", sum);
-#ifdef __WIN32__
 		       MessageBox(NULL, s, "unknown task", MB_OK);
-#else
-		       printf("%s\n", s);
-#endif
 		    }
 	       }
 	     break;
@@ -273,11 +222,7 @@ __declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles )
 	char s[1024];
 	FILE *f;
 	sprintf(s, "unknown task:\n\ttype:%d\n\tsum:%x\n\tPC:%x", task->type, sum, rsp.SP_PC_REG);
-#ifdef __WIN32__
 	MessageBox(NULL, s, "unknown task", MB_OK);
-#else
-	printf("%s\n", s);
-#endif
 
 	if (task->ucode_size <= 0x1000)
 	  {
@@ -337,7 +282,5 @@ __declspec(dllexport) void RomClosed (void)
      }
 /*   init_ucode1();
    init_ucode2();*/
-#ifdef __WIN32__
    firstTime = TRUE;
-#endif
 }
