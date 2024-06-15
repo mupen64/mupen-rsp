@@ -36,7 +36,7 @@ __declspec(dllexport) void DllConfig(HWND hParent)
 {
     if (!firstTime)
     {
-        MessageBox(NULL, "Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, MB_OK);
+        MessageBox(hParent, "Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, MB_OK);
         return;
     }
 
