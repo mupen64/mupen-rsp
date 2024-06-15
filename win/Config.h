@@ -1,10 +1,12 @@
+#pragma once
 
-void WriteCfgString   (const char *Section,const char *Key, char *Value) ;
-void WriteCfgInt      (const char *Section,const char *Key, int Value) ;
-void ReadCfgString    (const char *Section,const char *Key, const char *DefaultValue,char *retValue) ;
-int ReadCfgInt        (const char *Section,const char *Key, int DefaultValue) ;
+/**
+ * \brief Saves the config
+ */
+void config_save();
 
- 
-void LoadConfig()  ;
-void SaveConfig()  ; 
+/**
+ * \brief Loads the config
+ */
+void config_load();
     

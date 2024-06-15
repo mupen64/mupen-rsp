@@ -157,7 +157,7 @@ DllMain (
         dll_hInstance = hInst  ;
         getAppFullPath(AppPath);    
         search_plugins();
-        LoadConfig();
+        config_load();
         audiohandle = (HMODULE)get_handle(liste_plugins, audioname);
         break;
 
@@ -258,7 +258,7 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
                     index = SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETCURSEL, 0, 0);
                     SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETLBTEXT, index, (LPARAM)audioname); 
                     audiohandle = (HMODULE)get_handle(liste_plugins, audioname);
-                    SaveConfig();
+                    config_save();
                     EndDialog(hwnd, IDOK);
                 break;
                 case IDC_ALISTS_INSIDE_RSP:

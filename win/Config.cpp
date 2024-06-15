@@ -50,7 +50,7 @@ int ReadCfgInt        (const char *Section,const char *Key,int DefaultValue)
 
 //////////////////////////// Load and Save Config //////////////////////////////
 
-void LoadConfig()
+void config_load()
 {
     AudioHle = ReadCfgInt( "Settings", "AudioHle", FALSE);
     GraphicsHle = ReadCfgInt( "Settings", "GraphicsHle", TRUE);
@@ -61,7 +61,7 @@ void LoadConfig()
 /////////////////////////////////////////////////////////////////////////////////
 
 
-void SaveConfig()
+void config_save()
 {
     WriteCfgInt( "Settings", "AudioHle", AudioHle);
     WriteCfgInt( "Settings", "GraphicsHle", GraphicsHle);
