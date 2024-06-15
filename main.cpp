@@ -119,11 +119,11 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
     if (firstTime)
     {
         firstTime = FALSE;
-        if (config.SpecificHle)
+        if (config.audio_external)
             loadPlugin();
     }
 
-    if (task->type == 1 && task->data_ptr != 0 && config.GraphicsHle)
+    if (task->type == 1 && task->data_ptr != 0 && config.graphics_hle)
     {
         if (rsp.ProcessDlistList != NULL)
         {
@@ -139,9 +139,9 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
         *rsp.DPC_STATUS_REG &= ~0x0002;
         return Cycles;
     }
-    else if (task->type == 2 && config.AudioHle)
+    else if (task->type == 2 && config.audio_hle)
     {
-        if (config.SpecificHle)
+        if (config.audio_external)
             processAList();
         else if (rsp.ProcessAlistList != NULL)
         {

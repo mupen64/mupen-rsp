@@ -6,19 +6,19 @@ struct t_config
     /**
      * \brief Whether audio lists are processed externally
      */
-    bool AudioHle = false;
+    bool audio_hle = false;
     /**
      * \brief Whether display lists are processed externally
      */
-    bool GraphicsHle = true;
+    bool graphics_hle = true;
     /**
       * \brief Whether audio lists are processed by the audio plugin specified in audioname
       */
-    bool SpecificHle = false;
+    bool audio_external = false;
     /**
-      * \brief Path to the plugin 
+      * \brief Path to the external audio plugin path for alist processing 
       */
-    char audioname[100] = {0};
+    char audio_path[100] = {0};
 };
 
 extern t_config config;
