@@ -8,7 +8,7 @@
 
 #include <spec/Audio_#1.1.h>
 
-#include "win/Config.h"
+#include <Config.h>
 
 #define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.2.1"
 

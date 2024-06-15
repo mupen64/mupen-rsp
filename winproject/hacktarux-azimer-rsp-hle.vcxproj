@@ -147,6 +147,7 @@
         </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
+        <ClCompile Include="..\Config.cpp"/>
         <ClCompile Include="..\helpers\io_helpers.cpp" />
         <ClCompile Include="..\main.cpp"/>
         <ClCompile Include="..\disasm.cpp"/>
@@ -155,17 +156,16 @@
         <ClCompile Include="../ucode2.cpp"/>
         <ClCompile Include="../ucode3.cpp"/>
         <ClCompile Include="../ucode3mp3.cpp"/>
-        <ClCompile Include="..\win\Config.cpp"/>
         <ClCompile Include="..\win\win.cpp"/>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="..\Config.h" />
         <ClInclude Include="..\helpers\io_helpers.h" />
         <ClInclude Include="..\spec\Audio_#1.1.h"/>
         <ClInclude Include="..\spec\Rsp_#1.1.h"/>
         <ClInclude Include="resource.h"/>
         <ClInclude Include="../wintypes.h"/>
         <ClInclude Include="../hle.h"/>
-        <ClInclude Include="../win/Config.h"/>
         <ClInclude Include="../win/win.h"/>
     </ItemGroup>
     <ItemGroup>

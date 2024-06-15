@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "Config.h"
+#include <Config.h>
 
 #include <cstdio>
 

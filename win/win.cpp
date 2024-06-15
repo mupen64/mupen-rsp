@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string>
 
-#include "Config.h"
+#include <Config.h>
 #include <spec/Rsp_#1.1.h>
 #include <spec/Audio_#1.1.h>
 #include "../winproject/resource.h"
