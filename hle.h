@@ -41,15 +41,15 @@
 #endif
 
 // types
-typedef unsigned char		u8;
-typedef unsigned short		u16;
-typedef unsigned long		u32;
-typedef unsigned long long	u64;
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned long u32;
+typedef unsigned long long u64;
 
-typedef signed char			s8;
-typedef signed short		s16;
-typedef signed long			s32;
-typedef signed long long	s64;
+typedef signed char s8;
+typedef signed short s16;
+typedef signed long s32;
+typedef signed long long s64;
 
 //#define ACMD_SIZE               32
 /*
@@ -73,32 +73,32 @@ extern RSP_INFO rsp;
 
 typedef struct
 {
-   unsigned long type;
-   unsigned long flags;
-   
-   unsigned long ucode_boot;
-   unsigned long ucode_boot_size;
+    unsigned long type;
+    unsigned long flags;
 
-   unsigned long ucode;
-   unsigned long ucode_size;
-   
-   unsigned long ucode_data;
-   unsigned long ucode_data_size;
-   
-   unsigned long dram_stack;
-   unsigned long dram_stack_size;
-   
-   unsigned long output_buff;
-   unsigned long output_buff_size;
-   
-   unsigned long data_ptr;
-   unsigned long data_size;
-   
-   unsigned long yield_data_ptr;
-   unsigned long yield_data_size;
+    unsigned long ucode_boot;
+    unsigned long ucode_boot_size;
+
+    unsigned long ucode;
+    unsigned long ucode_size;
+
+    unsigned long ucode_data;
+    unsigned long ucode_data_size;
+
+    unsigned long dram_stack;
+    unsigned long dram_stack_size;
+
+    unsigned long output_buff;
+    unsigned long output_buff_size;
+
+    unsigned long data_ptr;
+    unsigned long data_size;
+
+    unsigned long yield_data_ptr;
+    unsigned long yield_data_size;
 } OSTask_t;
 
-void jpg_uncompress(OSTask_t *task);
+void jpg_uncompress(OSTask_t* task);
 /*void ucode1(OSTask_t *task);
 void ucode2(OSTask_t *task);
 void ucode3(OSTask_t *task);

@@ -12,17 +12,17 @@ typedef void* LPVOID;
 #define _cdecl
 #define WINAPI
 
-typedef u_int32_t		DWORD;
-typedef u_int16_t		WORD;
-typedef u_int8_t			BYTE, byte;
-typedef int			BOOL, BOOLEAN;
+typedef u_int32_t DWORD;
+typedef u_int16_t WORD;
+typedef u_int8_t BYTE, byte;
+typedef int BOOL, BOOLEAN;
 #define __int8                  char
 #define __int16                 short
 #define __int32	                int
 #define __int64                 long long
 
 /** HRESULT stuff **/
-typedef long				HRESULT;
+typedef long HRESULT;
 #define S_OK				((HRESULT)0L)
 #define E_NOTIMPL		0x80004001L
 

@@ -45,30 +45,31 @@ typedef struct {
 } PLUGIN_INFO;
 #endif
 
-typedef struct {
-	HWND hwnd;
-	HINSTANCE hinst;
+typedef struct
+{
+    HWND hwnd;
+    HINSTANCE hinst;
 
-	BOOL MemoryBswaped;    // If this is set to TRUE, then the memory has been pre
-	                       //   bswap on a dword (32 bits) boundry 
-						   //	eg. the first 8 bytes are stored like this:
-	                       //        4 3 2 1   8 7 6 5
-	BYTE * HEADER;	// This is the rom header (first 40h bytes of the rom
-					// This will be in the same memory format as the rest of the memory.
-	BYTE * RDRAM;
-	BYTE * DMEM;
-	BYTE * IMEM;
+    BOOL MemoryBswaped; // If this is set to TRUE, then the memory has been pre
+    //   bswap on a dword (32 bits) boundry 
+    //	eg. the first 8 bytes are stored like this:
+    //        4 3 2 1   8 7 6 5
+    BYTE* HEADER; // This is the rom header (first 40h bytes of the rom
+    // This will be in the same memory format as the rest of the memory.
+    BYTE* RDRAM;
+    BYTE* DMEM;
+    BYTE* IMEM;
 
-	DWORD * MI_INTR_REG;
+    DWORD* MI_INTR_REG;
 
-	DWORD * AI_DRAM_ADDR_REG;
-	DWORD * AI_LEN_REG;
-	DWORD * AI_CONTROL_REG;
-	DWORD * AI_STATUS_REG;
-	DWORD * AI_DACRATE_REG;
-	DWORD * AI_BITRATE_REG;
+    DWORD* AI_DRAM_ADDR_REG;
+    DWORD* AI_LEN_REG;
+    DWORD* AI_CONTROL_REG;
+    DWORD* AI_STATUS_REG;
+    DWORD* AI_DACRATE_REG;
+    DWORD* AI_BITRATE_REG;
 
-	void (*CheckInterrupts)( void );
+    void (*CheckInterrupts)(void);
 } AUDIO_INFO;
 
 /******************************************************************
@@ -80,8 +81,8 @@ typedef struct {
                SYSTEM_PAL	1
                SYSTEM_MPAL	2
   output:   none
-*******************************************************************/ 
-EXPORT void CALL AiDacrateChanged (int SystemType);
+*******************************************************************/
+EXPORT void CALL AiDacrateChanged(int SystemType);
 
 /******************************************************************
   Function: AiLenChanged
@@ -89,8 +90,8 @@ EXPORT void CALL AiDacrateChanged (int SystemType);
             AiLen registers value has been changed.
   input:    none
   output:   none
-*******************************************************************/ 
-EXPORT void CALL AiLenChanged (void);
+*******************************************************************/
+EXPORT void CALL AiLenChanged(void);
 
 /******************************************************************
   Function: AiReadLength
@@ -98,8 +99,8 @@ EXPORT void CALL AiLenChanged (void);
             value that AI_LEN_REG should equal
   input:    none
   output:   The amount of bytes still left to play.
-*******************************************************************/ 
-EXPORT DWORD CALL AiReadLength (void);
+*******************************************************************/
+EXPORT DWORD CALL AiReadLength(void);
 
 /******************************************************************
   Function: AiUpdate
@@ -112,8 +113,8 @@ EXPORT DWORD CALL AiReadLength (void);
   input:    if Wait is set to true, then this function should wait
             till there is a messgae in the its message queue.
   output:   none
-*******************************************************************/ 
-EXPORT void CALL AiUpdate (BOOL Wait);
+*******************************************************************/
+EXPORT void CALL AiUpdate(BOOL Wait);
 
 /******************************************************************
   Function: CloseDLL
@@ -121,8 +122,8 @@ EXPORT void CALL AiUpdate (BOOL Wait);
             down allowing the dll to de-initialise.
   input:    none
   output:   none
-*******************************************************************/ 
-EXPORT void CALL CloseDLL (void);
+*******************************************************************/
+EXPORT void CALL CloseDLL(void);
 
 /******************************************************************
   Function: DllAbout
@@ -130,8 +131,8 @@ EXPORT void CALL CloseDLL (void);
             to give further information about the DLL.
   input:    a handle to the window that calls this function
   output:   none
-*******************************************************************/ 
-EXPORT void CALL DllAbout ( HWND hParent );
+*******************************************************************/
+EXPORT void CALL DllAbout(HWND hParent);
 
 /******************************************************************
   Function: DllConfig
@@ -139,8 +140,8 @@ EXPORT void CALL DllAbout ( HWND hParent );
             to allow the user to configure the dll
   input:    a handle to the window that calls this function
   output:   none
-*******************************************************************/ 
-EXPORT void CALL DllConfig ( HWND hParent );
+*******************************************************************/
+EXPORT void CALL DllConfig(HWND hParent);
 
 /******************************************************************
   Function: DllTest
@@ -148,8 +149,8 @@ EXPORT void CALL DllConfig ( HWND hParent );
             to allow the user to test the dll
   input:    a handle to the window that calls this function
   output:   none
-*******************************************************************/ 
-EXPORT void CALL DllTest ( HWND hParent );
+*******************************************************************/
+EXPORT void CALL DllTest(HWND hParent);
 
 /******************************************************************
   Function: GetDllInfo
@@ -158,8 +159,8 @@ EXPORT void CALL DllTest ( HWND hParent );
   input:    a pointer to a PLUGIN_INFO stucture that needs to be
             filled by the function. (see def above)
   output:   none
-*******************************************************************/ 
-EXPORT void CALL GetDllInfo ( PLUGIN_INFO * PluginInfo );
+*******************************************************************/
+EXPORT void CALL GetDllInfo(PLUGIN_INFO* PluginInfo);
 
 /******************************************************************
   Function: InitiateSound
@@ -175,8 +176,8 @@ EXPORT void CALL GetDllInfo ( PLUGIN_INFO * PluginInfo );
   To generate an interrupt set the appropriate bit in MI_INTR_REG
   and then call the function CheckInterrupts to tell the emulator
   that there is a waiting interrupt.
-*******************************************************************/ 
-EXPORT BOOL CALL InitiateAudio (AUDIO_INFO Audio_Info);
+*******************************************************************/
+EXPORT BOOL CALL InitiateAudio(AUDIO_INFO Audio_Info);
 
 /******************************************************************
   Function: ProcessAList
@@ -185,7 +186,7 @@ EXPORT BOOL CALL InitiateAudio (AUDIO_INFO Audio_Info);
 			about the AList itself.
   input:    none
   output:   none
-*******************************************************************/ 
+*******************************************************************/
 EXPORT void CALL ProcessAList(void);
 
 /******************************************************************
@@ -193,8 +194,8 @@ EXPORT void CALL ProcessAList(void);
   Purpose:  This function is called when a rom is closed.
   input:    none
   output:   none
-*******************************************************************/ 
-EXPORT void CALL RomClosed (void);
+*******************************************************************/
+EXPORT void CALL RomClosed(void);
 
 #if defined(__cplusplus)
 }

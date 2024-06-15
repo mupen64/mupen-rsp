@@ -10,52 +10,52 @@
 ////////////////////// Service functions and structures ////////////////////////
 
 
-char *CfgFilePath()
+char* CfgFilePath()
 {
-   static char *cfgpath = NULL;
-   if (cfgpath == NULL)
-     {
-       	cfgpath = (char*)malloc(strlen(AppPath)+1+strlen(CfgFileName));
-	    strcpy(cfgpath, AppPath);
-    	strcat(cfgpath, CfgFileName);
-     }
-   return cfgpath;
+    static char* cfgpath = NULL;
+    if (cfgpath == NULL)
+    {
+        cfgpath = (char*)malloc(strlen(AppPath) + 1 + strlen(CfgFileName));
+        strcpy(cfgpath, AppPath);
+        strcat(cfgpath, CfgFileName);
+    }
+    return cfgpath;
 }
 
 
-void WriteCfgString   (const char *Section,const char *Key,char *Value) 
+void WriteCfgString(const char* Section, const char* Key, char* Value)
 {
-    WritePrivateProfileString( Section, Key, Value, CfgFilePath());
+    WritePrivateProfileString(Section, Key, Value, CfgFilePath());
 }
 
 
-void WriteCfgInt      (const char *Section,const char *Key,int Value) 
+void WriteCfgInt(const char* Section, const char* Key, int Value)
 {
     static char TempStr[100];
-    sprintf(TempStr,"%d",Value);
-    WriteCfgString( Section, Key, TempStr );
+    sprintf(TempStr, "%d", Value);
+    WriteCfgString(Section, Key, TempStr);
 }
 
 
-void ReadCfgString    (const char *Section,const char *Key,const char *DefaultValue,char *retValue) 
+void ReadCfgString(const char* Section, const char* Key, const char* DefaultValue, char* retValue)
 {
-    GetPrivateProfileString( Section, Key, DefaultValue, retValue, 100, CfgFilePath());
+    GetPrivateProfileString(Section, Key, DefaultValue, retValue, 100, CfgFilePath());
 }
 
 
-int ReadCfgInt        (const char *Section,const char *Key,int DefaultValue) 
+int ReadCfgInt(const char* Section, const char* Key, int DefaultValue)
 {
-    return GetPrivateProfileInt( Section, Key, DefaultValue, CfgFilePath());
+    return GetPrivateProfileInt(Section, Key, DefaultValue, CfgFilePath());
 }
 
 //////////////////////////// Load and Save Config //////////////////////////////
 
 void config_load()
 {
-    AudioHle = ReadCfgInt( "Settings", "AudioHle", FALSE);
-    GraphicsHle = ReadCfgInt( "Settings", "GraphicsHle", TRUE);
-    SpecificHle = ReadCfgInt( "Settings", "SpecificHle", FALSE);
-    ReadCfgString ( "Settings", "Audio Plugin", "", audioname );
+    AudioHle = ReadCfgInt("Settings", "AudioHle", FALSE);
+    GraphicsHle = ReadCfgInt("Settings", "GraphicsHle", TRUE);
+    SpecificHle = ReadCfgInt("Settings", "SpecificHle", FALSE);
+    ReadCfgString("Settings", "Audio Plugin", "", audioname);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -63,10 +63,8 @@ void config_load()
 
 void config_save()
 {
-    WriteCfgInt( "Settings", "AudioHle", AudioHle);
-    WriteCfgInt( "Settings", "GraphicsHle", GraphicsHle);
-    WriteCfgInt("Settings","SpecificHle",SpecificHle);
-    WriteCfgString("Settings","Audio Plugin",audioname);
+    WriteCfgInt("Settings", "AudioHle", AudioHle);
+    WriteCfgInt("Settings", "GraphicsHle", GraphicsHle);
+    WriteCfgInt("Settings", "SpecificHle", SpecificHle);
+    WriteCfgString("Settings", "Audio Plugin", audioname);
 }
-
-
