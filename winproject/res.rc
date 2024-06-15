@@ -1,20 +1,98 @@
-#include <windows.h>
+// Microsoft Visual C++ generated resource script.
+//
+#include <Windows.h>
 #include "resource.h"
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
 
-IDD_RSPCONFIG DIALOGEX 0, 0, 200, 200
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
-CAPTION "Rsp Configuration"    
-FONT 8, "Tahoma", 0, 0, 0x0
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_RSPCONFIG DIALOGEX 0, 0, 201, 206
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "RSP Configuration"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-GROUPBOX        "Configuration",IDC_METHOD,5,5,190,155
-CONTROL         "Process Alists inside RSP",IDC_ALISTS_INSIDE_RSP,"Button",BS_AUTORADIOBUTTON,16,
-                    20,160,12
-CONTROL         "Process Alists by emu defined plugin",IDC_ALISTS_EMU_DEFINED_PLUGIN,"Button",
-                    BS_AUTORADIOBUTTON,16,35,160,13
-CONTROL         "Process Alists by RSP defined plugin",IDC_ALISTS_RSP_DEFINED_PLUGIN,"Button",
-                    BS_AUTORADIOBUTTON,16,50,160,12
-COMBOBOX        IDC_COMBO_AUDIO,16,86,164,100,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP | WS_DISABLED
-DEFPUSHBUTTON   "&OK",IDOK,126,173,60,14                    
+    GROUPBOX        "Configuration",IDC_METHOD,6,6,186,180
+    CONTROL         "Process ALists inside RSP",IDC_ALISTS_INSIDE_RSP,"Button",BS_AUTORADIOBUTTON,12,18,160,8
+    CONTROL         "Process Alists by emu-defined plugin",IDC_ALISTS_EMU_DEFINED_PLUGIN, "Button",BS_AUTORADIOBUTTON,12, 30, 160, 8
+    CONTROL         "Process Alists by RSP-defined plugin",IDC_ALISTS_RSP_DEFINED_PLUGIN, "Button",BS_AUTORADIOBUTTON,12, 42, 160, 8
+    COMBOBOX        IDC_COMBO_AUDIO,12,54,164,100,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "&OK",IDOK,133,189,60,14
+    PUSHBUTTON      "Cancel",IDCANCEL,71,189,60,14
 END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_RSPCONFIG, DIALOG
+    BEGIN
+        HORZGUIDE, 189
+        HORZGUIDE, 201
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_RSPCONFIG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
