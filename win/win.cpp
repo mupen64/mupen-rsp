@@ -15,7 +15,6 @@ static AUDIO_INFO audio_info;
 static BOOL (*initiateAudio)(AUDIO_INFO Audio_Info);
 void (*getDllInfo)(PLUGIN_INFO* PluginInfo);
 static HMODULE audiohandle = NULL;
-char audioname[100];
 
 
 char AppPath[MAX_PATH];
@@ -163,7 +162,7 @@ DllMain(
         getAppFullPath(AppPath);
         search_plugins();
         config_load();
-        audiohandle = (HMODULE)get_handle(liste_plugins, audioname);
+        audiohandle = (HMODULE)get_handle(liste_plugins, config.audioname);
         break;
 
     case DLL_PROCESS_DETACH:
@@ -226,7 +225,7 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
             }
         }
 
-        index = SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_FINDSTRINGEXACT, 0, (LPARAM)audioname);
+        index = SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_FINDSTRINGEXACT, 0, (LPARAM)config.audioname);
         if (index != CB_ERR)
         {
             SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_SETCURSEL, index, 0);
@@ -234,16 +233,16 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
         else
         {
             SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_SETCURSEL, 0, 0);
-            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETLBTEXT, 0, (LPARAM)audioname);
+            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETLBTEXT, 0, (LPARAM)config.audioname);
         }
 
-        if (AudioHle == FALSE)
+        if (config.AudioHle == FALSE)
         {
             CheckDlgButton(hwnd, IDC_ALISTS_INSIDE_RSP, BST_CHECKED);
             EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
             break;
         }
-        else if (SpecificHle == FALSE)
+        else if (config.SpecificHle == FALSE)
         {
             CheckDlgButton(hwnd, IDC_ALISTS_EMU_DEFINED_PLUGIN, BST_CHECKED);
             EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
@@ -266,25 +265,26 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
         switch (LOWORD(wParam))
         {
         case IDOK:
+            // FIXME: Broken in new mupen versions! Hardcoded identifier...
             index = SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETCURSEL, 0, 0);
-            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETLBTEXT, index, (LPARAM)audioname);
-            audiohandle = (HMODULE)get_handle(liste_plugins, audioname);
+            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETLBTEXT, index, (LPARAM)config.audioname);
+            audiohandle = (HMODULE)get_handle(liste_plugins, config.audioname);
             config_save();
             EndDialog(hwnd, IDOK);
             break;
         case IDC_ALISTS_INSIDE_RSP:
-            AudioHle = FALSE;
-            SpecificHle = FALSE;
+            config.AudioHle = FALSE;
+            config.SpecificHle = FALSE;
             EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
             break;
         case IDC_ALISTS_EMU_DEFINED_PLUGIN:
-            AudioHle = TRUE;
-            SpecificHle = FALSE;
+            config.AudioHle = TRUE;
+            config.SpecificHle = FALSE;
             EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
             break;
         case IDC_ALISTS_RSP_DEFINED_PLUGIN:
-            AudioHle = TRUE;
-            SpecificHle = TRUE;
+            config.AudioHle = TRUE;
+            config.SpecificHle = TRUE;
             MessageBox(NULL,
                        "Warning: use this feature at your own risk\n"
                        "It allows you to use a second audio plugin to process alists\n"

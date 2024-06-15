@@ -147,6 +147,7 @@
         </Link>
     </ItemDefinitionGroup>
     <ItemGroup>
+        <ClCompile Include="..\helpers\io_helpers.cpp" />
         <ClCompile Include="..\main.cpp"/>
         <ClCompile Include="..\disasm.cpp"/>
         <ClCompile Include="..\jpeg.cpp"/>
@@ -158,6 +159,7 @@
         <ClCompile Include="..\win\win.cpp"/>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="..\helpers\io_helpers.h" />
         <ClInclude Include="..\spec\Audio_#1.1.h"/>
         <ClInclude Include="..\spec\Rsp_#1.1.h"/>
         <ClInclude Include="resource.h"/>

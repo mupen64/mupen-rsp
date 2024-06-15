@@ -3,68 +3,50 @@
 
 #include <cstdio>
 
-#include "win.h"
+#include <helpers/io_helpers.h>
 
-#define CfgFileName "mupen64_rsp_hle.cfg"
+#define CONFIG_PATH "hacktarux-azimer-rsp-hle.cfg"
 
-////////////////////// Service functions and structures ////////////////////////
-
-
-char* CfgFilePath()
-{
-    static char* cfgpath = NULL;
-    if (cfgpath == NULL)
-    {
-        cfgpath = (char*)malloc(strlen(AppPath) + 1 + strlen(CfgFileName));
-        strcpy(cfgpath, AppPath);
-        strcat(cfgpath, CfgFileName);
-    }
-    return cfgpath;
-}
-
-
-void WriteCfgString(const char* Section, const char* Key, char* Value)
-{
-    WritePrivateProfileString(Section, Key, Value, CfgFilePath());
-}
-
-
-void WriteCfgInt(const char* Section, const char* Key, int Value)
-{
-    static char TempStr[100];
-    sprintf(TempStr, "%d", Value);
-    WriteCfgString(Section, Key, TempStr);
-}
-
-
-void ReadCfgString(const char* Section, const char* Key, const char* DefaultValue, char* retValue)
-{
-    GetPrivateProfileString(Section, Key, DefaultValue, retValue, 100, CfgFilePath());
-}
-
-
-int ReadCfgInt(const char* Section, const char* Key, int DefaultValue)
-{
-    return GetPrivateProfileInt(Section, Key, DefaultValue, CfgFilePath());
-}
-
-//////////////////////////// Load and Save Config //////////////////////////////
-
-void config_load()
-{
-    AudioHle = ReadCfgInt("Settings", "AudioHle", FALSE);
-    GraphicsHle = ReadCfgInt("Settings", "GraphicsHle", TRUE);
-    SpecificHle = ReadCfgInt("Settings", "SpecificHle", FALSE);
-    ReadCfgString("Settings", "Audio Plugin", "", audioname);
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-
+t_config config = {};
+constexpr t_config default_config = {};
 
 void config_save()
 {
-    WriteCfgInt("Settings", "AudioHle", AudioHle);
-    WriteCfgInt("Settings", "GraphicsHle", GraphicsHle);
-    WriteCfgInt("Settings", "SpecificHle", SpecificHle);
-    WriteCfgString("Settings", "Audio Plugin", audioname);
+    printf("[RSP] Saving config...\n");
+    FILE* f = fopen(CONFIG_PATH, "wb");
+    if (!f)
+    {
+        printf("[RSP] Can't save config\n");
+        return;
+    }
+    fwrite(&config, sizeof(t_config), 1, f);
+    fclose(f);
+}
+
+void config_load()
+{
+    printf("[RSP] Loading config...\n");
+
+    auto buffer = read_file_buffer(CONFIG_PATH);
+    t_config loaded_config;
+
+    if (buffer.empty() || buffer.size() != sizeof(t_config))
+    {
+        // Failed, reset to default
+        printf("[RSP] No config found, using default\n");
+        loaded_config = default_config;
+    } else
+    {
+        uint8_t* ptr = buffer.data();
+        memread(&ptr, &loaded_config, sizeof(t_config));
+    }
+    
+    if (loaded_config.version < default_config.version)
+    {
+        // Outdated version, reset to default
+        printf("[RSP] Outdated config version, using default\n");
+        loaded_config = default_config;
+    }
+
+    config = loaded_config;
 }

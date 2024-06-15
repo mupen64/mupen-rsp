@@ -8,11 +8,12 @@
 
 #include <spec/Audio_#1.1.h>
 
+#include "win/Config.h"
+
 #define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.2.1"
 
 RSP_INFO rsp;
 
-BOOL AudioHle = FALSE, GraphicsHle = TRUE, SpecificHle = FALSE;
 
 extern void (*processAList)();
 static BOOL firstTime = TRUE;
@@ -118,11 +119,11 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
     if (firstTime)
     {
         firstTime = FALSE;
-        if (SpecificHle)
+        if (config.SpecificHle)
             loadPlugin();
     }
 
-    if (task->type == 1 && task->data_ptr != 0 && GraphicsHle)
+    if (task->type == 1 && task->data_ptr != 0 && config.GraphicsHle)
     {
         if (rsp.ProcessDlistList != NULL)
         {
@@ -138,9 +139,9 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
         *rsp.DPC_STATUS_REG &= ~0x0002;
         return Cycles;
     }
-    else if (task->type == 2 && AudioHle)
+    else if (task->type == 2 && config.AudioHle)
     {
-        if (SpecificHle)
+        if (config.SpecificHle)
             processAList();
         else if (rsp.ProcessAlistList != NULL)
         {
