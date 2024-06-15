@@ -2,6 +2,7 @@
 #include "win.h"
 
 #include <stdio.h>
+#include <string>
 
 #include "Config.h"
 #include <spec/Rsp_#1.1.h>
@@ -10,30 +11,27 @@
 
 extern RSP_INFO rsp;
 
-HINSTANCE dll_hInstance;
+HINSTANCE g_instance;
+std::string g_app_path;
+
 static AUDIO_INFO audio_info;
 static BOOL (*initiateAudio)(AUDIO_INFO Audio_Info);
 void (*getDllInfo)(PLUGIN_INFO* PluginInfo);
 static HMODULE audiohandle = NULL;
 
 
-char AppPath[MAX_PATH];
 
-void ShowMessage(LPSTR lpszMessage)
+std::string get_app_full_path()
 {
-    MessageBox(NULL, lpszMessage, "Info", MB_OK);
-}
-
-void getAppFullPath(char* ret)
-{
+    char ret[MAX_PATH] = {0};
     char drive[_MAX_DRIVE], dirn[_MAX_DIR];
-    char fname[_MAX_FNAME], ext[_MAX_EXT];
     char path_buffer[_MAX_DIR];
-
-    GetModuleFileName(dll_hInstance, path_buffer, sizeof(path_buffer));
-    _splitpath(path_buffer, drive, dirn, fname, ext);
+    GetModuleFileName(nullptr, path_buffer, sizeof(path_buffer));
+    _splitpath(path_buffer, drive, dirn, nullptr, nullptr);
     strcpy(ret, drive);
     strcat(ret, dirn);
+
+    return ret;
 }
 
 typedef struct _plugins plugins;
@@ -112,7 +110,7 @@ void search_plugins()
     liste_plugins->type = -1;
     liste_plugins->next = NULL;
 
-    sprintf(cwd, AppPath);
+    sprintf(cwd, g_app_path.c_str());
 
     hFind = FindFirstFile(cwd, &fd);
     while (FindNextFile(hFind, &fd))
@@ -158,8 +156,8 @@ DllMain(
     {
     case DLL_PROCESS_ATTACH:
     case DLL_THREAD_ATTACH:
-        dll_hInstance = hInst;
-        getAppFullPath(AppPath);
+        g_instance = hInst;
+        g_app_path = get_app_full_path();
         search_plugins();
         config_load();
         audiohandle = (HMODULE)get_handle(liste_plugins, config.audioname);

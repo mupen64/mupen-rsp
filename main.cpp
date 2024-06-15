@@ -40,7 +40,7 @@ __declspec(dllexport) void DllConfig(HWND hParent)
         return;
     }
 
-    DialogBox(dll_hInstance, MAKEINTRESOURCE(IDD_RSPCONFIG), hParent, ConfigDlgProc);
+    DialogBox(g_instance, MAKEINTRESOURCE(IDD_RSPCONFIG), hParent, ConfigDlgProc);
 }
 
 __declspec(dllexport) void DllTest(HWND hParent)
