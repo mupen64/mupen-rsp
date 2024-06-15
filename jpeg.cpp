@@ -30,7 +30,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "Rsp_#1.1.h"
+#include <spec/Rsp_#1.1.h>
 #include "hle.h"
 
 static struct 

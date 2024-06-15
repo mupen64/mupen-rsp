@@ -3,10 +3,10 @@
 #include "./win/win.h"
 #include <stdio.h>
 
-#include "Rsp_#1.1.h"
+#include <spec/Rsp_#1.1.h>
 #include "hle.h"
 
-#include "Audio_#1.1.h"
+#include <spec/Audio_#1.1.h>
 
 #define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.2.1"
 

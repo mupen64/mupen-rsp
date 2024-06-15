@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 #include "Config.h"
-#include "../Rsp_#1.1.h"
-#include "../Audio_#1.1.h"
+#include <spec/Rsp_#1.1.h>
+#include <spec/Audio_#1.1.h>
 #include "../winproject/resource.h"
 
 extern RSP_INFO rsp;
