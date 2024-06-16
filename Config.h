@@ -18,7 +18,7 @@ struct t_config
     /**
       * \brief Path to the external audio plugin path for alist processing 
       */
-    char audio_path[100] = {0};
+    char audio_path[260] = {0};
 };
 
 extern t_config config;

@@ -14,10 +14,17 @@
 
 RSP_INFO rsp;
 
+// Whether RSP has been called since last ROM close 
+bool rsp_alive = false;
 
-extern void (*processAList)();
-static BOOL firstTime = TRUE;
-void loadPlugin();
+HMODULE audio_plugin = nullptr;
+extern void (*g_processAList)();
+
+/**
+ * \brief Loads the audio plugin's globals
+ * \param mod Handle to an audio plugin
+ */
+void plugin_load(HMODULE mod);
 
 void disasm(FILE* f, unsigned long t[0x1000 / 4]);
 
@@ -34,7 +41,7 @@ __declspec(dllexport) void DllAbout(HWND hParent)
 
 __declspec(dllexport) void DllConfig(HWND hParent)
 {
-    if (!firstTime)
+    if (rsp_alive)
     {
         MessageBox(hParent, "Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, MB_OK);
         return;
@@ -116,12 +123,23 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
     OSTask_t* task = (OSTask_t*)(rsp.DMEM + 0xFC0);
     unsigned int i, sum = 0;
 
-    if (firstTime)
+    rsp_alive = true;
+
+    // For first-time initialization of audio plugin
+    // I think it's safe to keep the plugin loaded across emulation starts...
+    if (config.audio_external && !audio_plugin)
     {
-        firstTime = FALSE;
-        if (config.audio_external)
-            loadPlugin();
+        auto mod = LoadLibrary(config.audio_path);
+        if (!mod)
+        {
+            MessageBox(nullptr, "Failed to load the external audio plugin.", PLUGIN_NAME, MB_ICONERROR | MB_OK);
+            return 0;
+        }
+
+        audio_plugin = mod;
+        plugin_load(audio_plugin);
     }
+    
 
     if (task->type == 1 && task->data_ptr != 0 && config.graphics_hle)
     {
@@ -142,7 +160,7 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
     else if (task->type == 2 && config.audio_hle)
     {
         if (config.audio_external)
-            processAList();
+            g_processAList();
         else if (rsp.ProcessAlistList != NULL)
         {
             rsp.ProcessAlistList();
@@ -295,5 +313,5 @@ __declspec(dllexport) void RomClosed(void)
     }
     /*   init_ucode1();
        init_ucode2();*/
-    firstTime = TRUE;
+    rsp_alive = false;
 }

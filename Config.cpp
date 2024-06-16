@@ -34,7 +34,7 @@ void config_load()
     {
         // Failed, reset to default
         printf("[RSP] No config found, using default\n");
-        loaded_config = default_config;
+        memcpy(&loaded_config, &default_config, sizeof(t_config));
     } else
     {
         uint8_t* ptr = buffer.data();
@@ -45,8 +45,8 @@ void config_load()
     {
         // Outdated version, reset to default
         printf("[RSP] Outdated config version, using default\n");
-        loaded_config = default_config;
+        memcpy(&loaded_config, &default_config, sizeof(t_config));
     }
 
-    config = loaded_config;
+    memcpy(&config, &loaded_config, sizeof(t_config));
 }

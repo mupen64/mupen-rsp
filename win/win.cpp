@@ -14,12 +14,10 @@ extern RSP_INFO rsp;
 HINSTANCE g_instance;
 std::string g_app_path;
 
-static AUDIO_INFO audio_info;
-static BOOL (*initiateAudio)(AUDIO_INFO Audio_Info);
-void (*getDllInfo)(PLUGIN_INFO* PluginInfo);
-static HMODULE audiohandle = NULL;
+// ProcessAList function from audio plugin, only populated when audio_external is true
+void (*g_processAList)() = nullptr;
 
-
+t_config prev_config = {};
 
 std::string get_app_full_path()
 {
@@ -34,64 +32,6 @@ std::string get_app_full_path()
     return ret;
 }
 
-typedef struct _plugins plugins;
-
-struct _plugins
-{
-    char* file_name;
-    char* plugin_name;
-    HMODULE handle;
-    int type;
-    plugins* next;
-};
-
-static plugins *liste_plugins = NULL, *current;
-
-void insert_plugin(plugins* p, char* file_name,
-                   char* plugin_name, void* handle, int type, int num)
-{
-    if (p->next)
-        insert_plugin(p->next, file_name, plugin_name, handle, type,
-                      (p->type == type) ? num + 1 : num);
-    else
-    {
-        p->next = (plugins*)malloc(sizeof(plugins));
-        p->next->type = type;
-        p->next->handle = (HMODULE)handle;
-        p->next->file_name = (char*)malloc(strlen(file_name) + 1);
-        strcpy(p->next->file_name, file_name);
-        p->next->plugin_name = (char*)malloc(strlen(plugin_name) + 7);
-        sprintf(p->next->plugin_name, "%s", plugin_name);
-        p->next->next = NULL;
-    }
-}
-
-void rewind_plugin()
-{
-    current = liste_plugins;
-}
-
-char* next_plugin()
-{
-    if (!current->next) return NULL;
-    current = current->next;
-    return current->plugin_name;
-}
-
-int get_plugin_type()
-{
-    if (!current->next) return -1;
-    return current->next->type;
-}
-
-void* get_handle(plugins* p, char* name)
-{
-    if (!p->next) return NULL;
-    if (!strcmp(p->next->plugin_name, name))
-        return p->next->handle;
-    else
-        return get_handle(p->next, name);
-}
 
 char* getExtension(char* str)
 {
@@ -99,52 +39,6 @@ char* getExtension(char* str)
     else return NULL;
 }
 
-void search_plugins()
-{
-    WIN32_FIND_DATA fd;
-    HANDLE hFind;
-    char cwd[MAX_PATH];
-    char name[MAX_PATH];
-
-    liste_plugins = (plugins*)malloc(sizeof(plugins));
-    liste_plugins->type = -1;
-    liste_plugins->next = NULL;
-
-    sprintf(cwd, g_app_path.c_str());
-
-    hFind = FindFirstFile(cwd, &fd);
-    while (FindNextFile(hFind, &fd))
-    {
-        HMODULE handle;
-
-        strcpy(name, cwd);
-        strcat(name, "\\");
-        strcat(name, fd.cFileName);
-
-        if (getExtension(fd.cFileName) != NULL && strcmp(getExtension(fd.cFileName), "dll") == 0)
-        {
-            handle = LoadLibrary(name);
-            if (handle)
-            {
-                PLUGIN_INFO PluginInfo;
-                getDllInfo = (void(__cdecl*)(PLUGIN_INFO* PluginInfo))GetProcAddress(handle, "GetDllInfo");
-                if (getDllInfo)
-                {
-                    getDllInfo(&PluginInfo);
-                    if (PluginInfo.Type == PLUGIN_TYPE_AUDIO)
-                    {
-                        insert_plugin(liste_plugins, name, PluginInfo.Name,
-                                      handle, PluginInfo.Type, 0);
-                    }
-                }
-            }
-        }
-    }
-    current = liste_plugins;
-}
-
-
-void (*processAList)();
 
 BOOL APIENTRY
 DllMain(
@@ -158,9 +52,10 @@ DllMain(
     case DLL_THREAD_ATTACH:
         g_instance = hInst;
         g_app_path = get_app_full_path();
-        search_plugins();
         config_load();
-        audiohandle = (HMODULE)get_handle(liste_plugins, config.audio_path);
+
+    // FIXME: Are we really sure we want to load the audio plugin here, and not on RomOpen?
+    // audiohandle = (HMODULE)get_handle(liste_plugins, config.audio_path);
         break;
 
     case DLL_PROCESS_DETACH:
@@ -181,109 +76,82 @@ static DWORD fake_AI_STATUS_REG;
 static DWORD fake_AI_DACRATE_REG;
 static DWORD fake_AI_BITRATE_REG;
 
-void loadPlugin()
+void plugin_load(HMODULE mod)
 {
-    if (!audiohandle) return;
-    audio_info.hinst = rsp.hInst;
-    audio_info.MemoryBswaped = TRUE;
-    audio_info.HEADER = fake_header;
-    audio_info.RDRAM = rsp.RDRAM;
-    audio_info.DMEM = rsp.DMEM;
-    audio_info.IMEM = rsp.IMEM;
-    audio_info.MI_INTR_REG = rsp.MI_INTR_REG;
-    audio_info.AI_DRAM_ADDR_REG = &fake_AI_DRAM_ADDR_REG;
-    audio_info.AI_LEN_REG = &fake_AI_LEN_REG;
-    audio_info.AI_CONTROL_REG = &fake_AI_CONTROL_REG;
-    audio_info.AI_STATUS_REG = &fake_AI_STATUS_REG;
-    audio_info.AI_DACRATE_REG = &fake_AI_DACRATE_REG;
-    audio_info.AI_BITRATE_REG = &fake_AI_BITRATE_REG;
-    audio_info.CheckInterrupts = rsp.CheckInterrupts;
-    initiateAudio = (BOOL (__cdecl *)(AUDIO_INFO))GetProcAddress(audiohandle, "InitiateAudio");
-    processAList = (void (__cdecl *)(void))GetProcAddress(audiohandle, "ProcessAList");
-    initiateAudio(audio_info);
+    AUDIO_INFO info;
+    // FIXME: Do we have to provide hwnd?
+    info.hwnd = NULL;
+    info.hinst = rsp.hInst;
+    info.MemoryBswaped = TRUE;
+    info.HEADER = fake_header;
+    info.RDRAM = rsp.RDRAM;
+    info.DMEM = rsp.DMEM;
+    info.IMEM = rsp.IMEM;
+    info.MI_INTR_REG = rsp.MI_INTR_REG;
+    info.AI_DRAM_ADDR_REG = &fake_AI_DRAM_ADDR_REG;
+    info.AI_LEN_REG = &fake_AI_LEN_REG;
+    info.AI_CONTROL_REG = &fake_AI_CONTROL_REG;
+    info.AI_STATUS_REG = &fake_AI_STATUS_REG;
+    info.AI_DACRATE_REG = &fake_AI_DACRATE_REG;
+    info.AI_BITRATE_REG = &fake_AI_BITRATE_REG;
+    info.CheckInterrupts = rsp.CheckInterrupts;
+    auto initiateAudio = (BOOL (__cdecl *)(AUDIO_INFO))GetProcAddress(mod, "InitiateAudio");
+    g_processAList = (void (__cdecl *)(void))GetProcAddress(mod, "ProcessAList");
+    initiateAudio(info);
 }
 
 
 BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
-    int index;
     switch (Message)
     {
     case WM_INITDIALOG:
-        rewind_plugin();
-        while (get_plugin_type() != -1)
-        {
-            switch (get_plugin_type())
-            {
-            case PLUGIN_TYPE_AUDIO:
-                SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_ADDSTRING, 0, (LPARAM)next_plugin());
-                break;
-            default:
-                next_plugin();
-            }
-        }
+        config_load();
+        memcpy(&prev_config, &config, sizeof(t_config));
 
-        index = SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_FINDSTRINGEXACT, 0, (LPARAM)config.audio_path);
-        if (index != CB_ERR)
-        {
-            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_SETCURSEL, index, 0);
-        }
-        else
-        {
-            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_SETCURSEL, 0, 0);
-            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETLBTEXT, 0, (LPARAM)config.audio_path);
-        }
-
-        if (config.audio_hle == FALSE)
+        if (!config.audio_hle && !config.audio_external)
         {
             CheckDlgButton(hwnd, IDC_ALISTS_INSIDE_RSP, BST_CHECKED);
-            EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
-            break;
         }
-        else if (config.audio_external == FALSE)
+        if (config.audio_hle && !config.audio_external)
         {
             CheckDlgButton(hwnd, IDC_ALISTS_EMU_DEFINED_PLUGIN, BST_CHECKED);
-            EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
-            break;
         }
-        else
+        if (config.audio_hle && config.audio_external)
         {
             CheckDlgButton(hwnd, IDC_ALISTS_RSP_DEFINED_PLUGIN, BST_CHECKED);
-            EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), TRUE);
-            break;
         }
-
-        return TRUE;
-
+        goto refresh;
     case WM_CLOSE:
+        config_save();
         EndDialog(hwnd, IDOK);
         break;
-
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
         case IDOK:
-            // FIXME: Broken in new mupen versions! Hardcoded identifier...
-            index = SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETCURSEL, 0, 0);
-            SendDlgItemMessage(hwnd, IDC_COMBO_AUDIO, CB_GETLBTEXT, index, (LPARAM)config.audio_path);
-            audiohandle = (HMODULE)get_handle(liste_plugins, config.audio_path);
             config_save();
             EndDialog(hwnd, IDOK);
+            break;
+        case IDCANCEL:
+            memcpy(&config, &prev_config, sizeof(t_config));
+            config_save();
+            EndDialog(hwnd, IDCANCEL);
             break;
         case IDC_ALISTS_INSIDE_RSP:
             config.audio_hle = FALSE;
             config.audio_external = FALSE;
-            EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
-            break;
+            goto refresh;
         case IDC_ALISTS_EMU_DEFINED_PLUGIN:
             config.audio_hle = TRUE;
             config.audio_external = FALSE;
-            EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), FALSE);
-            break;
+            goto refresh;
         case IDC_ALISTS_RSP_DEFINED_PLUGIN:
             config.audio_hle = TRUE;
             config.audio_external = TRUE;
-            MessageBox(NULL,
+            goto refresh;
+        case IDC_BROWSE_AUDIO_PLUGIN:
+            MessageBox(hwnd,
                        "Warning: use this feature at your own risk\n"
                        "It allows you to use a second audio plugin to process alists\n"
                        "before they are sent\n"
@@ -292,12 +160,33 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
                        "Do not choose the same plugin in both place, or it'll probably crash\n"
                        "For more informations, please read the README",
                        "Warning", MB_OK);
-            EnableWindow(GetDlgItem(hwnd,IDC_COMBO_AUDIO), TRUE);
-            break;
+
+            char path[sizeof(config.audio_path)] = {0};
+            OPENFILENAME ofn{};
+            ofn.lStructSize = sizeof(ofn);
+            ofn.hwndOwner = hwnd;
+            ofn.lpstrFile = path;
+            ofn.nMaxFile = sizeof(path);
+            ofn.lpstrFilter = "DLL Files (*.dll)\0*.dll";
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
+
+            if (GetOpenFileName(&ofn))
+            {
+                strcpy(config.audio_path, path);
+            }
+
+            goto refresh;
         }
         break;
     default:
         return FALSE;
     }
+    return TRUE;
+
+refresh:
+    EnableWindow(GetDlgItem(hwnd, IDC_EDIT_AUDIO_PLUGIN), config.audio_external);
+    EnableWindow(GetDlgItem(hwnd, IDC_BROWSE_AUDIO_PLUGIN), config.audio_external);
+    SetDlgItemText(hwnd, IDC_EDIT_AUDIO_PLUGIN, config.audio_path);
+
     return TRUE;
 }
