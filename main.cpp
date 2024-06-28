@@ -26,8 +26,6 @@ extern void (*g_processAList)();
  */
 void plugin_load(HMODULE mod);
 
-void disasm(FILE* f, unsigned long t[0x1000 / 4]);
-
 __declspec(dllexport) void CloseDLL(void)
 {
 }
@@ -249,43 +247,7 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
         }
     }
 
-    {
-        char s[1024];
-        FILE* f;
-        sprintf(s, "unknown task:\n\ttype:%d\n\tsum:%x\n\tPC:%x", task->type, sum, rsp.SP_PC_REG);
-        MessageBox(NULL, s, "unknown task", MB_OK);
-
-        if (task->ucode_size <= 0x1000)
-        {
-            f = fopen("imem.dat", "wb");
-            fwrite(rsp.RDRAM + task->ucode, task->ucode_size, 1, f);
-            fclose(f);
-
-            f = fopen("dmem.dat", "wb");
-            fwrite(rsp.RDRAM + task->ucode_data, task->ucode_data_size, 1, f);
-            fclose(f);
-
-            f = fopen("disasm.txt", "wb");
-            memcpy(rsp.DMEM, rsp.RDRAM + task->ucode_data, task->ucode_data_size);
-            memcpy(rsp.IMEM + 0x80, rsp.RDRAM + task->ucode, 0xF7F);
-            disasm(f, (unsigned long*)(rsp.IMEM));
-            fclose(f);
-        }
-        else
-        {
-            f = fopen("imem.dat", "wb");
-            fwrite(rsp.IMEM, 0x1000, 1, f);
-            fclose(f);
-
-            f = fopen("dmem.dat", "wb");
-            fwrite(rsp.DMEM, 0x1000, 1, f);
-            fclose(f);
-
-            f = fopen("disasm.txt", "wb");
-            disasm(f, (unsigned long*)(rsp.IMEM));
-            fclose(f);
-        }
-    }
+    handle_unknown_task(task, sum);
 
     return Cycles;
 }
