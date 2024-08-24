@@ -247,13 +247,13 @@
         <ClInclude Include="..\helpers\io_helpers.h" />
         <ClInclude Include="..\spec\Audio_#1.1.h"/>
         <ClInclude Include="..\spec\Rsp_#1.1.h"/>
-        <ClInclude Include="resource.h"/>
+        <ClInclude Include="../win/resource.h"/>
         <ClInclude Include="../wintypes.h"/>
         <ClInclude Include="../hle.h"/>
         <ClInclude Include="../win/win.h"/>
     </ItemGroup>
     <ItemGroup>
-        <ResourceCompile Include="res.rc"/>
+        <ResourceCompile Include="../win/res.rc"/>
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">

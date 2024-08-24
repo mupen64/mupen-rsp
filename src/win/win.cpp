@@ -8,7 +8,7 @@
 #include <spec/Rsp_#1.1.h>
 #include <spec/Audio_#1.1.h>
 #include <helpers/disasm.h>
-#include "../winproject/resource.h"
+#include <win/resource.h>
 
 extern RSP_INFO rsp;
 

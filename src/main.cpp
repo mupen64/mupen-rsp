@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "./winproject/resource.h"
+#include <win/resource.h>
 #include "./win/win.h"
 #include <stdio.h>
 
