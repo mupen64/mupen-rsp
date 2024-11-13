@@ -2,10 +2,11 @@
 #define __RSP_1_1_H__
 
 #if defined(__cplusplus)
+
+#include <cstdint>
+
 extern "C" {
 #endif
-
-/* Note: BOOL, BYTE, WORD, DWORD, TRUE, FALSE are defined in windows.h */
 
 #define PLUGIN_TYPE_RSP				1
 #define PLUGIN_TYPE_GFX				2
@@ -14,46 +15,46 @@ extern "C" {
 
 typedef struct
 {
-    WORD Version; /* Should be set to 0x0101 */
-    WORD Type; /* Set to PLUGIN_TYPE_RSP */
+    uint16_t Version; /* Should be set to 0x0101 */
+    uint16_t Type; /* Set to PLUGIN_TYPE_RSP */
     char Name[100]; /* Name of the DLL */
 
     /* If DLL supports memory these memory options then set them to TRUE or FALSE
        if it does not support it */
-    BOOL NormalMemory; /* a normal BYTE array */
-    BOOL MemoryBswaped; /* a normal BYTE array where the memory has been pre
+    int32_t NormalMemory; /* a normal uint8_t array */
+    int32_t MemoryBswaped; /* a normal uint8_t array where the memory has been pre
 	                          bswap on a dword (32 bits) boundry */
 } PLUGIN_INFO;
 
 typedef struct
 {
-    HINSTANCE hInst;
-    BOOL MemoryBswaped; /* If this is set to TRUE, then the memory has been pre
+    void* hInst;
+    int32_t MemoryBswaped; /* If this is set to TRUE, then the memory has been pre
 	                          bswap on a dword (32 bits) boundry */
-    BYTE* RDRAM;
-    BYTE* DMEM;
-    BYTE* IMEM;
+    uint8_t* RDRAM;
+    uint8_t* DMEM;
+    uint8_t* IMEM;
 
-    DWORD* MI_INTR_REG;
+    uint32_t* MI_INTR_REG;
 
-    DWORD* SP_MEM_ADDR_REG;
-    DWORD* SP_DRAM_ADDR_REG;
-    DWORD* SP_RD_LEN_REG;
-    DWORD* SP_WR_LEN_REG;
-    DWORD* SP_STATUS_REG;
-    DWORD* SP_DMA_FULL_REG;
-    DWORD* SP_DMA_BUSY_REG;
-    DWORD* SP_PC_REG;
-    DWORD* SP_SEMAPHORE_REG;
+    uint32_t* SP_MEM_ADDR_REG;
+    uint32_t* SP_DRAM_ADDR_REG;
+    uint32_t* SP_RD_LEN_REG;
+    uint32_t* SP_WR_LEN_REG;
+    uint32_t* SP_STATUS_REG;
+    uint32_t* SP_DMA_FULL_REG;
+    uint32_t* SP_DMA_BUSY_REG;
+    uint32_t* SP_PC_REG;
+    uint32_t* SP_SEMAPHORE_REG;
 
-    DWORD* DPC_START_REG;
-    DWORD* DPC_END_REG;
-    DWORD* DPC_CURRENT_REG;
-    DWORD* DPC_STATUS_REG;
-    DWORD* DPC_CLOCK_REG;
-    DWORD* DPC_BUFBUSY_REG;
-    DWORD* DPC_PIPEBUSY_REG;
-    DWORD* DPC_TMEM_REG;
+    uint32_t* DPC_START_REG;
+    uint32_t* DPC_END_REG;
+    uint32_t* DPC_CURRENT_REG;
+    uint32_t* DPC_STATUS_REG;
+    uint32_t* DPC_CLOCK_REG;
+    uint32_t* DPC_BUFBUSY_REG;
+    uint32_t* DPC_PIPEBUSY_REG;
+    uint32_t* DPC_TMEM_REG;
 
     void (*CheckInterrupts)(void);
     void (*ProcessDlistList)(void);
@@ -66,20 +67,10 @@ typedef struct
 {
     /* Menu */
     /* Items should have an ID between 5001 and 5100 */
-    HMENU hRSPMenu;
+    void* hRSPMenu;
     void (*ProcessMenuItem)(int ID);
 
-    /* Break Points */
-    BOOL UseBPoints;
-    char BPPanelName[20];
-    void (*Add_BPoint)(void);
-    void (*CreateBPPanel)(HWND hDlg, RECT rcBox);
-    void (*HideBPPanel)(void);
-    void (*PaintBPPanel)(PAINTSTRUCT ps);
-    void (*ShowBPPanel)(void);
-    void (*RefreshBpoints)(HWND hList);
-    void (*RemoveBpoint)(HWND hList, int index);
-    void (*RemoveAllBpoint)(void);
+    // NOTE: Breakpoint API omitted.
 
     /* RSP command Window */
     void (*Enter_RSP_Commands_Window)(void);
@@ -113,7 +104,7 @@ __declspec(dllexport) void CloseDLL(void);
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/
-__declspec(dllexport) void DllAbout(HWND hParent);
+__declspec(dllexport) void DllAbout(void* hParent);
 
 /******************************************************************
   Function: DllConfig
@@ -122,7 +113,7 @@ __declspec(dllexport) void DllAbout(HWND hParent);
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/
-__declspec(dllexport) void DllConfig(HWND hParent);
+__declspec(dllexport) void DllConfig(void* hParent);
 
 /******************************************************************
   Function: DllTest
@@ -131,7 +122,7 @@ __declspec(dllexport) void DllConfig(HWND hParent);
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/
-__declspec(dllexport) void DllTest(HWND hParent);
+__declspec(dllexport) void DllTest(void* hParent);
 
 /******************************************************************
   Function: DoRspCycles
@@ -144,7 +135,7 @@ __declspec(dllexport) void DllTest(HWND hParent);
 			should have performed.
 			(this value is ignored if the RSP is stoped)
 *******************************************************************/
-__declspec(dllexport) DWORD DoRspCycles(DWORD Cycles);
+__declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles);
 
 /******************************************************************
   Function: GetDllInfo
@@ -178,7 +169,7 @@ __declspec(dllexport) void GetRspDebugInfo(RSPDEBUG_INFO* RSPDebugInfo);
 			control between the RSP and r4300i core.
   output:   none
 *******************************************************************/
-__declspec(dllexport) void InitiateRSP(RSP_INFO Rsp_Info, DWORD* CycleCount);
+__declspec(dllexport) void InitiateRSP(RSP_INFO Rsp_Info, uint32_t* CycleCount);
 
 /******************************************************************
   Function: InitiateRSPDebugger

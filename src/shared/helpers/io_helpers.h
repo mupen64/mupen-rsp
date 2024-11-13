@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <Windows.h>
 #include <string>
 #include <vector>
 
@@ -18,46 +17,6 @@ std::vector<std::string> get_files_with_extension_in_directory(
  */
 std::vector<std::string> get_files_in_subdirectories(
 	const std::string& directory);
-
-/**
- * \brief Removes the extension from a path
- * \param path The path to remove the extension from
- * \return The path without an extension
- */
-std::string strip_extension(const std::string& path);
-
-/**
- * \brief Removes the extension from a path
- * \param path The path to remove the extension from
- * \return The path without an extension
- */
-std::wstring strip_extension(const std::wstring &path);
-
-/**
- * \brief Copies a string to the clipboard
- * \param owner The clipboard content's owner window
- * \param str The string to be copied
- */
-void copy_to_clipboard(HWND owner, const std::string &str);
-
-/**
- * \brief Gets the path to the current user's desktop
- */
-std::wstring get_desktop_path();
-
-/**
- * \brief Gets whether a file is accessible
- * \param path The file to check against
- */
-bool is_file_accessible(const std::filesystem::path& path);
-
-/**
- * \brief Writes data to a vector at its tail end based on its size, expanding it as needed
- * \param vec The target vector
- * \param data The source data
- * \param len The source data's size in bytes
- */
-void vecwrite(std::vector<uint8_t>& vec, void* data, size_t len);
 
 /**
  * \brief Reads a file into a buffer

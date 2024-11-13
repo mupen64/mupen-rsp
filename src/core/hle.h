@@ -30,7 +30,7 @@
 #ifndef HLE_H
 #define HLE_H
 
-#include <spec/Rsp_#1.1.h>
+#include <shared/spec/RSP.h>
 
 #ifdef _BIG_ENDIAN
 #define S 0

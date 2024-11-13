@@ -1,4 +1,4 @@
-#include "io_helpers.h"
+#include <shared/helpers/io_helpers.h>
 #include <cstdio>
 #include <Windows.h>
 #include <shlobj.h>
@@ -90,28 +90,6 @@ std::vector<std::string> get_files_in_subdirectories(
 	return paths;
 }
 
-std::string strip_extension(const std::string& path)
-{
-	size_t i = path.find_last_of('.');
-
-	if (i != std::string::npos)
-	{
-		return path.substr(0, i);
-	}
-	return path;
-}
-
-std::wstring strip_extension(const std::wstring& path)
-{
-	size_t i = path.find_last_of('.');
-
-	if (i != std::string::npos)
-	{
-		return path.substr(0, i);
-	}
-	return path;
-}
-
 void copy_to_clipboard(HWND owner, const std::string& str)
 {
 	OpenClipboard(owner);
@@ -129,30 +107,6 @@ void copy_to_clipboard(HWND owner, const std::string& str)
 		printf("Failed to copy\n");
 		CloseClipboard();
 	}
-}
-
-std::wstring get_desktop_path()
-{
-	wchar_t path[MAX_PATH + 1] = {0};
-	SHGetSpecialFolderPathW(HWND_DESKTOP, path, CSIDL_DESKTOP, FALSE);
-	return path;
-}
-
-bool is_file_accessible(const std::filesystem::path& path)
-{
-	FILE* f = fopen(path.string().c_str(), "r");
-	if (!f)
-	{
-		return false;
-	}
-	fclose(f);
-	return true;
-}
-
-void vecwrite(std::vector<uint8_t>& vec, void* data, size_t len)
-{
-	vec.resize(vec.size() + len);
-	memcpy(vec.data() + (vec.size() - len), data, len);
 }
 
 std::vector<uint8_t> read_file_buffer(const std::filesystem::path& path)

@@ -1,9 +1,6 @@
-#include <windows.h>
-#include <Config.h>
-
+#include <shared/Config.h>
+#include <shared/helpers/io_helpers.h>
 #include <cstdio>
-
-#include <helpers/io_helpers.h>
 
 #define CONFIG_PATH "hacktarux-azimer-rsp-hle.cfg"
 

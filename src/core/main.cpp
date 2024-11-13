@@ -1,54 +1,67 @@
-#include <windows.h>
-#include <win/resource.h>
-#include "./win/win.h"
-#include <stdio.h>
+#include <cstdio>
+#include <memory>
+#include <string>
+#include <shared/Config.h>
+#include <shared/spec/RSP.h>
 
-#include <spec/Rsp_#1.1.h>
 #include "hle.h"
-
-#include <spec/Audio_#1.1.h>
-
-#include <Config.h>
-
-#define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.2.1"
+#include "shared/services/FrontendService.h"
 
 RSP_INFO rsp;
 
 // Whether RSP has been called since last ROM close 
 bool rsp_alive = false;
 
-HMODULE audio_plugin = nullptr;
+void* audio_plugin = nullptr;
 extern void (*g_processAList)();
+
+#define UCODE_MARIO (1)
+#define UCODE_BANJO (2)
+#define UCODE_ZELDA (3)
+
+extern void (*ABI1[0x20])();
+extern void (*ABI2[0x20])();
+extern void (*ABI3[0x20])();
+
+void (*ABI[0x20])();
+
+u32 inst1, inst2;
 
 /**
  * \brief Loads the audio plugin's globals
- * \param mod Handle to an audio plugin
+ * \param path Path to an audio plugin dll
+ * \returns Handle to the audio plugin, or nullptr.
  */
-void plugin_load(HMODULE mod);
+void* plugin_load(const std::string& path);
+
+/**
+ * \brief Handles unknown RSP tasks.
+ */
+void handle_unknown_task(const OSTask_t* task, uint32_t sum);
 
 __declspec(dllexport) void CloseDLL(void)
 {
 }
 
-__declspec(dllexport) void DllAbout(HWND hParent)
+__declspec(dllexport) void DllAbout(void* hParent)
 {
     auto message =
         "Made using Azimer's code by Hacktarux.\r\nMaintained by Aurumaker72\r\nhttps://github.com/Aurumaker72/hacktarux-azimer-rsp-hle";
-    MessageBox(NULL, message, PLUGIN_NAME, MB_OK);
+    FrontendService::show_info(message, PLUGIN_NAME, hParent);
 }
 
-__declspec(dllexport) void DllConfig(HWND hParent)
+__declspec(dllexport) void DllConfig(void* hParent)
 {
     if (rsp_alive)
     {
-        MessageBox(hParent, "Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, MB_OK);
+        FrontendService::show_error("Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, hParent);
         return;
     }
 
-    DialogBox(g_instance, MAKEINTRESOURCE(IDD_RSPCONFIG), hParent, ConfigDlgProc);
+    FrontendService::show_config_dialog(hParent);
 }
 
-__declspec(dllexport) void DllTest(HWND hParent)
+__declspec(dllexport) void DllTest(void* hParent)
 {
 }
 
@@ -70,43 +83,29 @@ static int audio_ucode_detect(OSTask_t* task)
     }
 }
 
-extern void (*ABI1[0x20])();
-extern void (*ABI2[0x20])();
-extern void (*ABI3[0x20])();
-
-void (*ABI[0x20])();
-
-u32 inst1, inst2;
-
 static int audio_ucode(OSTask_t* task)
 {
-    unsigned long* p_alist = (unsigned long*)(rsp.RDRAM + task->data_ptr);
-    unsigned int i;
+    auto ucode_kind = audio_ucode_detect(task);
+    printf("[RSP] ucode kind: %d", ucode_kind);
 
-    switch (audio_ucode_detect(task))
+    switch (ucode_kind)
     {
-    case 1: // mario ucode
+    case UCODE_MARIO:
         memcpy(ABI, ABI1, sizeof(ABI[0]) * 0x20);
         break;
-    case 2: // banjo kazooie ucode
+    case UCODE_BANJO:
         memcpy(ABI, ABI2, sizeof(ABI[0]) * 0x20);
         break;
-    case 3: // zelda ucode
+    case UCODE_ZELDA:
         memcpy(ABI, ABI3, sizeof(ABI[0]) * 0x20);
         break;
     default:
-        {
-            /*		char s[1024];
-                    sprintf(s, "unknown audio\n\tsum:%x", sum);
-                    MessageBox(NULL, s, "unknown task", MB_OK);
-            */
-            return -1;
-        }
+        return -1;
     }
 
-    //	data = (short*)(rsp.RDRAM + task->ucode_data);
+    const auto p_alist = (unsigned long*)(rsp.RDRAM + task->data_ptr);
 
-    for (i = 0; i < (task->data_size / 4); i += 2)
+    for (unsigned int i = 0; i < (task->data_size / 4); i += 2)
     {
         inst1 = p_alist[i];
         inst2 = p_alist[i + 1];
@@ -116,7 +115,7 @@ static int audio_ucode(OSTask_t* task)
     return 0;
 }
 
-__declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
+__declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
 {
     OSTask_t* task = (OSTask_t*)(rsp.DMEM + 0xFC0);
     unsigned int i, sum = 0;
@@ -127,17 +126,9 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
     // I think it's safe to keep the plugin loaded across emulation starts...
     if (config.audio_external && !audio_plugin)
     {
-        auto mod = LoadLibrary(config.audio_path);
-        if (!mod)
-        {
-            MessageBox(nullptr, "Failed to load the external audio plugin.", PLUGIN_NAME, MB_ICONERROR | MB_OK);
-            return 0;
-        }
-
-        audio_plugin = mod;
-        plugin_load(audio_plugin);
+        audio_plugin = plugin_load(config.audio_path);
     }
-    
+
 
     if (task->type == 1 && task->data_ptr != 0 && config.graphics_hle)
     {
@@ -240,7 +231,7 @@ __declspec(dllexport) DWORD DoRspCycles(DWORD Cycles)
                 {
                     char s[1024];
                     sprintf(s, "unknown jpeg:\n\tsum:%x", sum);
-                    MessageBox(NULL, s, "unknown task", MB_OK);
+                    FrontendService::show_error(s);
                 }
             }
             break;
@@ -257,11 +248,11 @@ __declspec(dllexport) void GetDllInfo(PLUGIN_INFO* PluginInfo)
     PluginInfo->Version = 0x0101;
     PluginInfo->Type = PLUGIN_TYPE_RSP;
     strcpy(PluginInfo->Name, PLUGIN_NAME);
-    PluginInfo->NormalMemory = TRUE;
-    PluginInfo->MemoryBswaped = TRUE;
+    PluginInfo->NormalMemory = 1;
+    PluginInfo->MemoryBswaped = 1;
 }
 
-__declspec(dllexport) void InitiateRSP(RSP_INFO Rsp_Info, DWORD* CycleCount)
+__declspec(dllexport) void InitiateRSP(RSP_INFO Rsp_Info, uint32_t* CycleCount)
 {
     rsp = Rsp_Info;
 }

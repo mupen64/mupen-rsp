@@ -27,11 +27,12 @@
  *
 **/
 
-#include <windows.h>
-#include <stdio.h>
+#include <memory>
+#include <cstdio>
 
-#include <spec/Rsp_#1.1.h>
+#include <shared/spec/RSP.h>
 #include "hle.h"
+#include "shared/services/FrontendService.h"
 
 static struct
 {
@@ -76,7 +77,7 @@ void jpg_uncompress(OSTask_t* task)
     }
     else
     {
-        MessageBox(NULL, "!flags", "!flags", MB_OK);
+        FrontendService::show_error("!flags");
     }
     pic = (short*)(rsp.RDRAM + jpg_data.pic);
 

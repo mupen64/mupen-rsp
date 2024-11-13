@@ -1,5 +1,7 @@
 #pragma once
 
+#define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.2.1"
+
 struct t_config
 {
     size_t version = 0;
