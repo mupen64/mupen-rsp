@@ -22,10 +22,4 @@ namespace FrontendService
      * \param hwnd The parent window
      */
     void show_info(const char* str, const char* title = nullptr, void* hwnd = nullptr);
-
-    /**
-     * Shows the user a configuration dialog.
-     * \param parent The parent window.
-     */
-    void show_config_dialog(void* parent);
 }

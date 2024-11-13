@@ -13,6 +13,7 @@
 #include "shared/services/FrontendService.h"
 
 extern RSP_INFO rsp;
+extern bool g_rsp_alive;
 
 HINSTANCE g_instance;
 std::string g_app_path;
@@ -82,7 +83,7 @@ static uint32_t fake_AI_BITRATE_REG;
 void* plugin_load(const std::string& path)
 {
     const auto module = LoadLibrary(path.c_str());
-    
+
     if (!module)
     {
         FrontendService::show_error("Failed to load the external audio plugin.\nEmulation will not behave as expected.");
@@ -202,7 +203,7 @@ refresh:
     EnableWindow(GetDlgItem(hwnd, IDC_EDIT_AUDIO_PLUGIN), config.audio_external);
     EnableWindow(GetDlgItem(hwnd, IDC_BROWSE_AUDIO_PLUGIN), config.audio_external);
     SetDlgItemText(hwnd, IDC_EDIT_AUDIO_PLUGIN, config.audio_path);
-    
+
     return TRUE;
 }
 
@@ -243,4 +244,26 @@ void handle_unknown_task(const OSTask_t* task, const uint32_t sum)
         disasm(f, (unsigned long*)(rsp.IMEM));
         fclose(f);
     }
+}
+
+__declspec(dllexport) void DllAbout(void* hParent)
+{
+    auto message =
+        "Made using Azimer's code by Hacktarux.\r\nMaintained by Aurumaker72\r\nhttps://github.com/Aurumaker72/hacktarux-azimer-rsp-hle";
+    FrontendService::show_info(message, PLUGIN_NAME, hParent);
+}
+
+__declspec(dllexport) void DllConfig(void* hParent)
+{
+    if (g_rsp_alive)
+    {
+        FrontendService::show_error("Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, hParent);
+        return;
+    }
+
+    DialogBox(g_instance, MAKEINTRESOURCE(IDD_RSPCONFIG), (HWND)hParent, ConfigDlgProc);
+}
+
+__declspec(dllexport) void DllTest(void* hParent)
+{
 }

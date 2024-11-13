@@ -32,8 +32,3 @@ void FrontendService::show_info(const char* str, const char* title, void* hwnd)
 {
     MessageBox(static_cast<HWND>(hwnd ? hwnd : get_emu_window()), str, title ? title : PLUGIN_NAME, MB_ICONINFORMATION);
 }
-
-void FrontendService::show_config_dialog(void* parent)
-{
-    DialogBox(g_instance, MAKEINTRESOURCE(IDD_RSPCONFIG), (HWND)parent, ConfigDlgProc);
-}

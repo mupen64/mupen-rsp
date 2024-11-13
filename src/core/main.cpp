@@ -11,7 +11,7 @@
 RSP_INFO rsp;
 
 // Whether RSP has been called since last ROM close 
-bool rsp_alive = false;
+bool g_rsp_alive = false;
 
 void* audio_plugin = nullptr;
 extern void (*g_processAList)();
@@ -41,33 +41,6 @@ void* plugin_load(const std::string& path);
  * \brief Handles unknown RSP tasks.
  */
 void handle_unknown_task(const OSTask_t* task, uint32_t sum);
-
-__declspec(dllexport) void CloseDLL(void)
-{
-}
-
-__declspec(dllexport) void DllAbout(void* hParent)
-{
-    auto message =
-        "Made using Azimer's code by Hacktarux.\r\nMaintained by Aurumaker72\r\nhttps://github.com/Aurumaker72/hacktarux-azimer-rsp-hle";
-    FrontendService::show_info(message, PLUGIN_NAME, hParent);
-}
-
-__declspec(dllexport) void DllConfig(void* hParent)
-{
-    if (rsp_alive)
-    {
-        FrontendService::show_error("Close the ROM before configuring the RSP plugin.", PLUGIN_NAME, hParent);
-        return;
-    }
-
-    FrontendService::show_config_dialog(hParent);
-}
-
-__declspec(dllexport) void DllTest(void* hParent)
-{
-}
-
 
 void audio_ucode_mario()
 {
@@ -169,7 +142,7 @@ __declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
     OSTask_t* task = (OSTask_t*)(rsp.DMEM + 0xFC0);
     unsigned int i, sum = 0;
 
-    rsp_alive = true;
+    g_rsp_alive = true;
 
     // For first-time initialization of audio plugin
     // I think it's safe to keep the plugin loaded across emulation starts...
@@ -292,6 +265,10 @@ __declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
     return Cycles;
 }
 
+__declspec(dllexport) void CloseDLL(void)
+{
+}
+
 __declspec(dllexport) void GetDllInfo(PLUGIN_INFO* PluginInfo)
 {
     PluginInfo->Version = 0x0101;
@@ -312,5 +289,5 @@ __declspec(dllexport) void RomClosed(void)
     memset(rsp.IMEM, 0, 0x1000);
     
     g_audio_ucode_func = nullptr;
-    rsp_alive = false;
+    g_rsp_alive = false;
 }
