@@ -315,5 +315,6 @@ __declspec(dllexport) void RomClosed(void)
     }
     /*   init_ucode1();
        init_ucode2();*/
+    g_audio_ucode_func = nullptr;
     rsp_alive = false;
 }
