@@ -308,13 +308,9 @@ __declspec(dllexport) void InitiateRSP(RSP_INFO Rsp_Info, uint32_t* CycleCount)
 
 __declspec(dllexport) void RomClosed(void)
 {
-    int i;
-    for (i = 0; i < 0x1000; i++)
-    {
-        rsp.DMEM[i] = rsp.IMEM[i] = 0;
-    }
-    /*   init_ucode1();
-       init_ucode2();*/
+    memset(rsp.DMEM, 0, 0x1000);
+    memset(rsp.IMEM, 0, 0x1000);
+    
     g_audio_ucode_func = nullptr;
     rsp_alive = false;
 }
