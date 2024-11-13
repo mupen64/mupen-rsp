@@ -9,3 +9,4 @@
 #define IDC_METHOD                     104
 #define IDC_EDIT_AUDIO_PLUGIN          106
 #define IDC_BROWSE_AUDIO_PLUGIN        107
+#define IDC_UCODE_CACHE_VERIFY         108

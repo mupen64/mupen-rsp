@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <cstdio>
 #include <memory>
 #include <string>
@@ -26,6 +27,8 @@ extern void (*ABI3[0x20])();
 void (*ABI[0x20])();
 
 u32 inst1, inst2;
+
+void (*g_audio_ucode_func)() = nullptr;
 
 /**
  * \brief Loads the audio plugin's globals
@@ -65,43 +68,89 @@ __declspec(dllexport) void DllTest(void* hParent)
 {
 }
 
-static int audio_ucode_detect(OSTask_t* task)
+
+void audio_ucode_mario()
+{
+    memcpy(ABI, ABI1, sizeof(ABI[0]) * 0x20);
+}
+
+void audio_ucode_banjo()
+{
+    memcpy(ABI, ABI2, sizeof(ABI[0]) * 0x20);
+}
+
+void audio_ucode_zelda()
+{
+    memcpy(ABI, ABI3, sizeof(ABI[0]) * 0x20);
+}
+
+
+int audio_ucode_detect_type(const OSTask_t* task)
 {
     if (*(unsigned long*)(rsp.RDRAM + task->ucode_data + 0) != 0x1)
     {
         if (*(rsp.RDRAM + task->ucode_data + (0 ^ (3 - S8))) == 0xF)
             return 4;
-        else
-            return 3;
+        return 3;
     }
-    else
+
+    if (*(unsigned long*)(rsp.RDRAM + task->ucode_data + 0x30) == 0xF0000F00)
+        return 1;
+    return 2;
+}
+
+void audio_ucode_verify_cache(const OSTask_t* task)
+{
+    // In debug mode, we want to verify that the ucode type hasn't changed
+    const auto ucode_type = audio_ucode_detect_type(task);
+    
+    switch (ucode_type)
     {
-        if (*(unsigned long*)(rsp.RDRAM + task->ucode_data + 0x30) == 0xF0000F00)
-            return 1;
-        else
-            return 2;
+    case UCODE_MARIO:
+        assert(g_audio_ucode_func == audio_ucode_mario);
+        break;
+    case UCODE_BANJO:
+        assert(g_audio_ucode_func == audio_ucode_banjo);
+        break;
+    case UCODE_ZELDA:
+        assert(g_audio_ucode_func == audio_ucode_zelda);
+        break;
+    default:
+        break;
     }
 }
 
-static int audio_ucode(OSTask_t* task)
+int audio_ucode(OSTask_t* task)
 {
-    auto ucode_kind = audio_ucode_detect(task);
-    printf("[RSP] ucode kind: %d", ucode_kind);
-
-    switch (ucode_kind)
+    if (!g_audio_ucode_func)
     {
-    case UCODE_MARIO:
-        memcpy(ABI, ABI1, sizeof(ABI[0]) * 0x20);
-        break;
-    case UCODE_BANJO:
-        memcpy(ABI, ABI2, sizeof(ABI[0]) * 0x20);
-        break;
-    case UCODE_ZELDA:
-        memcpy(ABI, ABI3, sizeof(ABI[0]) * 0x20);
-        break;
-    default:
-        return -1;
+        const auto ucode_type = audio_ucode_detect_type(task);
+
+        printf("[RSP] Detected ucode type: %d\n", ucode_type);
+
+        switch (ucode_type)
+        {
+        case UCODE_MARIO:
+            g_audio_ucode_func = audio_ucode_mario;
+            break;
+        case UCODE_BANJO:
+            g_audio_ucode_func = audio_ucode_banjo;
+            break;
+        case UCODE_ZELDA:
+            g_audio_ucode_func = audio_ucode_zelda;
+            break;
+        default:
+            printf("[RSP] Unknown ucode type: %d\n", ucode_type);
+            return -1;
+        }
     }
+
+    if (config.ucode_cache_verify)
+    {
+        audio_ucode_verify_cache(task);
+    }
+    
+    g_audio_ucode_func();
 
     const auto p_alist = (unsigned long*)(rsp.RDRAM + task->data_ptr);
 

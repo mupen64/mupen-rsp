@@ -134,6 +134,7 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
         {
             CheckDlgButton(hwnd, IDC_ALISTS_RSP_DEFINED_PLUGIN, BST_CHECKED);
         }
+        CheckDlgButton(hwnd, IDC_UCODE_CACHE_VERIFY, config.ucode_cache_verify ? BST_CHECKED : BST_UNCHECKED);
         goto refresh;
     case WM_CLOSE:
         config_save();
@@ -143,6 +144,7 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
         switch (LOWORD(wParam))
         {
         case IDOK:
+            config.ucode_cache_verify = IsDlgButtonChecked(hwnd, IDC_UCODE_CACHE_VERIFY);
             config_save();
             EndDialog(hwnd, IDOK);
             break;
@@ -200,7 +202,7 @@ refresh:
     EnableWindow(GetDlgItem(hwnd, IDC_EDIT_AUDIO_PLUGIN), config.audio_external);
     EnableWindow(GetDlgItem(hwnd, IDC_BROWSE_AUDIO_PLUGIN), config.audio_external);
     SetDlgItemText(hwnd, IDC_EDIT_AUDIO_PLUGIN, config.audio_path);
-
+    
     return TRUE;
 }
 
