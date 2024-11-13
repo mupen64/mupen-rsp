@@ -4,11 +4,13 @@
 #include <stdio.h>
 #include <string>
 
-#include <Config.h>
-#include <spec/Rsp_#1.1.h>
-#include <spec/Audio_#1.1.h>
-#include <helpers/disasm.h>
+#include <shared/Config.h>
+#include <shared/spec/RSP.h>
+#include <shared/spec/Audio.h>
+#include <shared/helpers/disasm.h>
 #include <win/resource.h>
+
+#include "shared/services/FrontendService.h"
 
 extern RSP_INFO rsp;
 
@@ -69,20 +71,28 @@ DllMain(
     return TRUE;
 }
 
-static BYTE fake_header[0x1000];
-static DWORD fake_AI_DRAM_ADDR_REG;
-static DWORD fake_AI_LEN_REG;
-static DWORD fake_AI_CONTROL_REG;
-static DWORD fake_AI_STATUS_REG;
-static DWORD fake_AI_DACRATE_REG;
-static DWORD fake_AI_BITRATE_REG;
+static uint8_t fake_header[0x1000];
+static uint32_t fake_AI_DRAM_ADDR_REG;
+static uint32_t fake_AI_LEN_REG;
+static uint32_t fake_AI_CONTROL_REG;
+static uint32_t fake_AI_STATUS_REG;
+static uint32_t fake_AI_DACRATE_REG;
+static uint32_t fake_AI_BITRATE_REG;
 
-void plugin_load(HMODULE mod)
+void* plugin_load(const std::string& path)
 {
+    const auto module = LoadLibrary(path.c_str());
+    
+    if (!module)
+    {
+        FrontendService::show_error("Failed to load the external audio plugin.\nEmulation will not behave as expected.");
+        return nullptr;
+    }
+
     AUDIO_INFO info;
     // FIXME: Do we have to provide hwnd?
     info.hwnd = NULL;
-    info.hinst = rsp.hInst;
+    info.hinst = (HINSTANCE)rsp.hInst;
     info.MemoryBswaped = TRUE;
     info.HEADER = fake_header;
     info.RDRAM = rsp.RDRAM;
@@ -96,9 +106,11 @@ void plugin_load(HMODULE mod)
     info.AI_DACRATE_REG = &fake_AI_DACRATE_REG;
     info.AI_BITRATE_REG = &fake_AI_BITRATE_REG;
     info.CheckInterrupts = rsp.CheckInterrupts;
-    auto initiateAudio = (BOOL (__cdecl *)(AUDIO_INFO))GetProcAddress(mod, "InitiateAudio");
-    g_processAList = (void (__cdecl *)(void))GetProcAddress(mod, "ProcessAList");
+    auto initiateAudio = (BOOL (__cdecl *)(AUDIO_INFO))GetProcAddress(module, "InitiateAudio");
+    g_processAList = (void (__cdecl *)(void))GetProcAddress(module, "ProcessAList");
     initiateAudio(info);
+
+    return module;
 }
 
 
