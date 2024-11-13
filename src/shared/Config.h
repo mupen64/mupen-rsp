@@ -1,6 +1,6 @@
 #pragma once
 
-#define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.2.1"
+#define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.3.0"
 
 struct t_config
 {
