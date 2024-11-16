@@ -80,7 +80,7 @@
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
             <LanguageStandard>stdcpplatest</LanguageStandard>
-            <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+            <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
             <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
         </ClCompile>
         <Link>
@@ -101,7 +101,7 @@
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
             <LanguageStandard>stdcpplatest</LanguageStandard>
-            <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+            <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
             <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
         </ClCompile>
         <Link>
@@ -121,7 +121,7 @@
             <ConformanceMode>true</ConformanceMode>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-            <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+            <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
             <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
         </ClCompile>
         <Link>
@@ -141,7 +141,7 @@
             <ConformanceMode>true</ConformanceMode>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-            <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+            <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
             <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
         </ClCompile>
         <Link>
