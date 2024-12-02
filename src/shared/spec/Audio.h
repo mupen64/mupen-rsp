@@ -24,56 +24,8 @@ extern "C" {
 
 /* Note: int32_t, uint8_t, WORD, uint32_t, TRUE, FALSE are defined in windows.h */
 
-#define PLUGIN_TYPE_AUDIO			3
-
 #define EXPORT						__declspec(dllexport)
 #define CALL						_cdecl
-
-#define SYSTEM_NTSC					0
-#define SYSTEM_PAL					1
-#define SYSTEM_MPAL					2
-
-#ifdef NOTDEF
-/***** Structures *****/
-typedef struct {
-	WORD Version;        /* Should be set to 0x0101 */
-	WORD Type;           /* Set to PLUGIN_TYPE_AUDIO */
-	char Name[100];      /* Name of the DLL */
-
-	/* If DLL supports memory these memory options then set them to TRUE or FALSE
-	   if it does not support it */
-	int32_t NormalMemory;   /* a normal uint8_t array */ 
-	int32_t MemoryBswaped;  /* a normal uint8_t array where the memory has been pre
-	                          bswap on a dword (32 bits) boundry */
-} PLUGIN_INFO;
-#endif
-
-typedef struct
-{
-    void* hwnd;
-    void* hinst;
-
-    int32_t MemoryBswaped; // If this is set to TRUE, then the memory has been pre
-    //   bswap on a dword (32 bits) boundry 
-    //	eg. the first 8 bytes are stored like this:
-    //        4 3 2 1   8 7 6 5
-    uint8_t* HEADER; // This is the rom header (first 40h bytes of the rom
-    // This will be in the same memory format as the rest of the memory.
-    uint8_t* RDRAM;
-    uint8_t* DMEM;
-    uint8_t* IMEM;
-
-    uint32_t* MI_INTR_REG;
-
-    uint32_t* AI_DRAM_ADDR_REG;
-    uint32_t* AI_LEN_REG;
-    uint32_t* AI_CONTROL_REG;
-    uint32_t* AI_STATUS_REG;
-    uint32_t* AI_DACRATE_REG;
-    uint32_t* AI_BITRATE_REG;
-
-    void (*CheckInterrupts)(void);
-} AUDIO_INFO;
 
 /******************************************************************
   Function: AiDacrateChanged

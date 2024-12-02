@@ -272,7 +272,7 @@ __declspec(dllexport) void CloseDLL(void)
 __declspec(dllexport) void GetDllInfo(PLUGIN_INFO* PluginInfo)
 {
     PluginInfo->Version = 0x0101;
-    PluginInfo->Type = PLUGIN_TYPE_RSP;
+    PluginInfo->Type = (int16_t)PluginType::RSP;
     strcpy(PluginInfo->Name, PLUGIN_NAME);
     PluginInfo->NormalMemory = 1;
     PluginInfo->MemoryBswaped = 1;
