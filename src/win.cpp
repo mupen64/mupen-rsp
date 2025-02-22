@@ -46,31 +46,19 @@ char* getExtension(char* str)
 }
 
 
-BOOL APIENTRY
-DllMain(
-HINSTANCE hInst /* Library instance handle. */,
-DWORD reason /* Reason this function is being called. */,
-LPVOID reserved /* Not used. */)
+BOOL APIENTRY DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
 {
     switch (reason)
     {
     case DLL_PROCESS_ATTACH:
-    case DLL_THREAD_ATTACH:
-        g_instance = hInst;
+        g_instance = hinst;
         g_app_path = get_app_full_path();
         config_load();
-
-        // FIXME: Are we really sure we want to load the audio plugin here, and not on RomOpen?
-        // audiohandle = (HMODULE)get_handle(liste_plugins, config.audio_path);
         break;
-
-    case DLL_PROCESS_DETACH:
-        break;
-    case DLL_THREAD_DETACH:
+    default:
         break;
     }
 
-    /* Returns TRUE on success, FALSE on failure */
     return TRUE;
 }
 
