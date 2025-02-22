@@ -27,8 +27,7 @@
  *
 **/
 
-#include <memory>
-#include <cstdio>
+#include "stdafx.h"
 #include "RSP.h"
 #include "hle.h"
 #include "FrontendService.h"

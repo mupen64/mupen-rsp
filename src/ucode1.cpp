@@ -1,5 +1,4 @@
-# include <windows.h>
-
+#include "stdafx.h"
 #include "hle.h"
 //#include "rsp.h"
 //#define SAFE_MEMORY

@@ -27,7 +27,7 @@
  *
 **/
 
-#include <stdio.h>
+#include "stdafx.h"
 
 void disasm(FILE* f, unsigned long t[0x1000 / 4])
 {

@@ -1,8 +1,7 @@
+#include "stdafx.h"
 #include "FrontendService.h"
 #include "Config.h"
-#include <Windows.h>
 #include "win.h"
-#include "resource.h"
 
 HWND get_emu_window()
 {

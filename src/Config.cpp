@@ -1,6 +1,6 @@
+#include "stdafx.h"
 #include "Config.h"
 #include "helpers/io_helpers.h"
-#include <cstdio>
 
 #define CONFIG_PATH "hacktarux-azimer-rsp-hle.cfg"
 

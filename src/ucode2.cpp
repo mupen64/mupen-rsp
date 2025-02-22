@@ -1,6 +1,4 @@
-# include <windows.h>
-# include <stdio.h>
-
+#include "stdafx.h"
 #include "hle.h"
 
 extern u8 BufferSpace[0x10000];

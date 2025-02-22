@@ -1,6 +1,4 @@
-# include <windows.h>
-# include <stdio.h>
-
+#include "stdafx.h"
 #include "hle.h"
 
 static void SPNOOP()

@@ -1,7 +1,4 @@
-#include <assert.h>
-#include <cstdio>
-#include <memory>
-#include <string>
+#include "stdafx.h"
 #include "Config.h"
 #include "RSP.h"
 #include "hle.h"

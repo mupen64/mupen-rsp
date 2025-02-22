@@ -15,9 +15,9 @@ the plugin.
 #ifndef _AUDIO_H_INCLUDED__
 #define _AUDIO_H_INCLUDED__
 
-#if defined(__cplusplus)
+#include "RSP.h"
 
-#include <cstdint>
+#if defined(__cplusplus)
 
 extern "C" {
 #endif

@@ -1,5 +1,4 @@
-# include <windows.h>
-
+#include "stdafx.h"
 #include "hle.h"
 
 static u16 DeWindowLUT[0x420] = {
