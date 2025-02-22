@@ -1,16 +1,13 @@
 #include <windows.h>
 #include "win.h"
-
 #include <stdio.h>
 #include <string>
-
-#include <shared/Config.h>
-#include <shared/spec/RSP.h>
-#include <shared/spec/Audio.h>
-#include <shared/helpers/disasm.h>
-#include <win/resource.h>
-
-#include "shared/services/FrontendService.h"
+#include "Config.h"
+#include "RSP.h"
+#include "Audio.h"
+#include "helpers/disasm.h"
+#include "resource.h"
+#include "FrontendService.h"
 
 extern RSP_INFO rsp;
 extern bool g_rsp_alive;

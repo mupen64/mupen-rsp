@@ -29,10 +29,9 @@
 
 #include <memory>
 #include <cstdio>
-
-#include <shared/spec/RSP.h>
+#include "RSP.h"
 #include "hle.h"
-#include "shared/services/FrontendService.h"
+#include "FrontendService.h"
 
 static struct
 {

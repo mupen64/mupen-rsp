@@ -2,11 +2,10 @@
 #include <cstdio>
 #include <memory>
 #include <string>
-#include <shared/Config.h>
-#include <shared/spec/RSP.h>
-
+#include "Config.h"
+#include "RSP.h"
 #include "hle.h"
-#include "shared/services/FrontendService.h"
+#include "FrontendService.h"
 
 RSP_INFO rsp;
 

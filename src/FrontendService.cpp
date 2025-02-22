@@ -1,5 +1,5 @@
-#include <shared/services/FrontendService.h>
-#include <shared/Config.h>
+#include "FrontendService.h"
+#include "Config.h"
 #include <Windows.h>
 #include "win.h"
 #include "resource.h"
