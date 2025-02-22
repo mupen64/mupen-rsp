@@ -1,9 +1,8 @@
 #include "stdafx.h"
-#include "Audio.h"
 #include "Config.h"
 #include "FrontendService.h"
 #include "RSP.h"
-#include "helpers/disasm.h"
+#include "disasm.h"
 #include "hle.h"
 #include "win.h"
 
