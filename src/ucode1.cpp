@@ -1,32 +1,12 @@
+/*
+ * Copyright (c) 2025, hacktarux-azimer-rsp-hle maintainers, contributors, and original authors (Hacktarux, Azimer).
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #include "stdafx.h"
 #include "hle.h"
-// #include "rsp.h"
-// #define SAFE_MEMORY
-/*
-#ifndef SAFE_MEMORY
-#	define wr8 (src , address);
-#	define rd8 (dest, address);
-#	define wr16 (src, address);
-#	define rd16 (dest, address);
-#	define wr32 (src, address);
-#	define rd32 (dest, address);
-#	define wr64 (src, address);
-#	define rd64 (dest, address);
-#	define dmamem (dest, src, size) memcpy (dest, src, size);
-#	define clrmem (dest, size)		memset (dest, 0, size);
-#else
-    void wr8 (uint8_t src, void *address);
-    void rd8 (uint8_t dest, void *address);
-    void wr16 (uint16_t src, void *address);
-    void rd16 (uint16_t dest, void *address);
-    void wr32 (uint16_t src, void *address);
-    void rd32 (uint16_t dest, void *address);
-    void wr64 (uint16_t src, void *address);
-    void rd64 (uint16_t dest, void *address);
-    void dmamem (void *dest, void *src, int size);
-    void clrmem (void *dest, int size);
-#endif
-*/
+
 /******** DMEM Memory Map for ABI 1 ***************
 Address/Range		Description
 -------------		-------------------------------
