@@ -40,17 +40,6 @@
 #define S8 3
 #endif
 
-// types
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned long u32;
-typedef unsigned long long u64;
-
-typedef signed char s8;
-typedef signed short s16;
-typedef signed long s32;
-typedef signed long long s64;
-
 //#define ACMD_SIZE               32
 /*
  * Audio flags
@@ -105,10 +94,10 @@ void ucode3(OSTask_t *task);
 void init_ucode1();
 void init_ucode2();*/
 
-extern u32 inst1, inst2;
-extern u16 AudioInBuffer, AudioOutBuffer, AudioCount;
-extern u16 AudioAuxA, AudioAuxC, AudioAuxE;
-extern u32 loopval; // Value set by A_SETLOOP : Possible conflict with SETVOLUME???
-//extern u32 UCData, UDataLen;
+extern uint32_t inst1, inst2;
+extern uint16_t AudioInBuffer, AudioOutBuffer, AudioCount;
+extern uint16_t AudioAuxA, AudioAuxC, AudioAuxE;
+extern uint32_t loopval; // Value set by A_SETLOOP : Possible conflict with SETVOLUME???
+//extern uint32_t UCData, UDataLen;
 
 #endif

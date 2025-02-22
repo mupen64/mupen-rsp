@@ -22,7 +22,7 @@ extern void (*ABI3[0x20])();
 
 void (*ABI[0x20])();
 
-u32 inst1, inst2;
+uint32_t inst1, inst2;
 
 void (*g_audio_ucode_func)() = nullptr;
 
