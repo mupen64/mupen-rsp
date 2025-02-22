@@ -6,7 +6,7 @@
 
 RSP_INFO rsp;
 
-// Whether RSP has been called since last ROM close 
+// Whether RSP has been called since last ROM close
 bool g_rsp_alive = false;
 
 void* audio_plugin = nullptr;
@@ -72,7 +72,7 @@ void audio_ucode_verify_cache(const OSTask_t* task)
 {
     // In debug mode, we want to verify that the ucode type hasn't changed
     const auto ucode_type = audio_ucode_detect_type(task);
-    
+
     switch (ucode_type)
     {
     case UCODE_MARIO:
@@ -118,7 +118,7 @@ int audio_ucode(OSTask_t* task)
     {
         audio_ucode_verify_cache(task);
     }
-    
+
     g_audio_ucode_func();
 
     const auto p_alist = (unsigned long*)(rsp.RDRAM + task->data_ptr);
@@ -283,7 +283,7 @@ __declspec(dllexport) void RomClosed(void)
 {
     memset(rsp.DMEM, 0, 0x1000);
     memset(rsp.IMEM, 0, 0x1000);
-    
+
     g_audio_ucode_func = nullptr;
     g_rsp_alive = false;
 }

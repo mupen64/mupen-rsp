@@ -3,28 +3,28 @@
 
 std::vector<uint8_t> read_file_buffer(const std::filesystem::path& path)
 {
-	FILE* f = fopen(path.string().c_str(), "rb");
+    FILE* f = fopen(path.string().c_str(), "rb");
 
-	if (!f)
-	{
-		return {};
-	}
+    if (!f)
+    {
+        return {};
+    }
 
-	fseek(f, 0, SEEK_END);
-	long len = ftell(f);
-	fseek(f, 0, SEEK_SET);
+    fseek(f, 0, SEEK_END);
+    long len = ftell(f);
+    fseek(f, 0, SEEK_SET);
 
-	std::vector<uint8_t> b;
-	b.resize(len);
+    std::vector<uint8_t> b;
+    b.resize(len);
 
-	fread(b.data(), sizeof(uint8_t), len, f);
+    fread(b.data(), sizeof(uint8_t), len, f);
 
-	fclose(f);
-	return b;
+    fclose(f);
+    return b;
 }
 
 void memread(uint8_t** src, void* dest, unsigned int len)
 {
-	memcpy(dest, *src, len);
-	*src += len;
+    memcpy(dest, *src, len);
+    *src += len;
 }

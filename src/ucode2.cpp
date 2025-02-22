@@ -66,7 +66,7 @@ static void ADPCM2()
     WORD Gain = (uint16_t)(inst1 & 0xffff);
     DWORD Address = (inst2 & 0xffffff); // + SEGMENTS[(inst2>>24)&0xf];
     WORD inPtr = 0;
-    //short *out=(int16_t *)(testbuff+(AudioOutBuffer>>2));
+    // short *out=(int16_t *)(testbuff+(AudioOutBuffer>>2));
     short* out = (short*)(BufferSpace + AudioOutBuffer);
     BYTE* in = (BYTE*)(BufferSpace + AudioInBuffer);
     short count = (short)AudioCount;
@@ -150,25 +150,33 @@ static void ADPCM2()
             inPtr++;
 
             inp1[j] = (int16_t)((icode & mask1) << 8); // this will in effect be signed
-            if (code < srange) inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
-            else int catchme = 1;
+            if (code < srange)
+                inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
+            else
+                int catchme = 1;
             j++;
 
             inp1[j] = (int16_t)((icode & mask2) << shifter);
-            if (code < srange) inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
-            else int catchme = 1;
+            if (code < srange)
+                inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
+            else
+                int catchme = 1;
             j++;
 
             if (Flags & 4)
             {
                 inp1[j] = (int16_t)((icode & 0xC) << 12); // this will in effect be signed
-                if (code < 0xE) inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
-                else int catchme = 1;
+                if (code < 0xE)
+                    inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
+                else
+                    int catchme = 1;
                 j++;
 
                 inp1[j] = (int16_t)((icode & 0x3) << 14);
-                if (code < 0xE) inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
-                else int catchme = 1;
+                if (code < 0xE)
+                    inp1[j] = ((int)((int)inp1[j] * (int)vscale) >> 16);
+                else
+                    int catchme = 1;
                 j++;
             } // end flags
         } // end while
@@ -181,25 +189,33 @@ static void ADPCM2()
             inPtr++;
 
             inp2[j] = (int16_t)((icode & mask1) << 8);
-            if (code < srange) inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
-            else int catchme = 1;
+            if (code < srange)
+                inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
+            else
+                int catchme = 1;
             j++;
 
             inp2[j] = (int16_t)((icode & mask2) << shifter);
-            if (code < srange) inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
-            else int catchme = 1;
+            if (code < srange)
+                inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
+            else
+                int catchme = 1;
             j++;
 
             if (Flags & 4)
             {
                 inp2[j] = (int16_t)((icode & 0xC) << 12);
-                if (code < 0xE) inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
-                else int catchme = 1;
+                if (code < 0xE)
+                    inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
+                else
+                    int catchme = 1;
                 j++;
 
                 inp2[j] = (int16_t)((icode & 0x3) << 14);
-                if (code < 0xE) inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
-                else int catchme = 1;
+                if (code < 0xE)
+                    inp2[j] = ((int)((int)inp2[j] * (int)vscale) >> 16);
+                else
+                    int catchme = 1;
                 j++;
             } // end flags
         }
@@ -267,8 +283,10 @@ static void ADPCM2()
         for (j = 0; j < 8; j++)
         {
             a[j ^ 1] >>= 11;
-            if (a[j ^ 1] > 32767) a[j ^ 1] = 32767;
-            else if (a[j ^ 1] < -32768) a[j ^ 1] = -32768;
+            if (a[j ^ 1] > 32767)
+                a[j ^ 1] = 32767;
+            else if (a[j ^ 1] < -32768)
+                a[j ^ 1] = -32768;
             *(out++) = a[j ^ 1];
         }
         l1 = a[6];
@@ -337,8 +355,10 @@ static void ADPCM2()
         for (j = 0; j < 8; j++)
         {
             a[j ^ 1] >>= 11;
-            if (a[j ^ 1] > 32767) a[j ^ 1] = 32767;
-            else if (a[j ^ 1] < -32768) a[j ^ 1] = -32768;
+            if (a[j ^ 1] > 32767)
+                a[j ^ 1] = 32767;
+            else if (a[j ^ 1] < -32768)
+                a[j ^ 1] = -32768;
             *(out++) = a[j ^ 1];
         }
         l1 = a[6];
@@ -388,7 +408,7 @@ static void MIXER2()
 
     for (int x = 0; x < count; x += 2)
     {
-        // I think I can do this a lot easier 
+        // I think I can do this a lot easier
 
         temp = (*(int16_t*)(BufferSpace + dmemin + x) * gain) >> 16;
         temp += *(int16_t*)(BufferSpace + dmemout + x);
@@ -427,7 +447,7 @@ static void RESAMPLE2()
 
     if ((Flags & 0x1) == 0)
     {
-        for (int x = 0; x < 4; x++) //memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
+        for (int x = 0; x < 4; x++) // memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
             src[(srcPtr + x) ^ 1] = ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1];
         Accum = *(uint16_t*)(rsp.RDRAM + addy + 10);
     }
@@ -443,23 +463,25 @@ static void RESAMPLE2()
     for (int i = 0; i < ((AudioCount + 0xf) & 0xFFF0) / 2; i++)
     {
         location = (((Accum * 0x40) >> 0x10) * 8);
-        //location = (Accum >> 0xa) << 0x3;
+        // location = (Accum >> 0xa) << 0x3;
         lut = (int16_t*)(((uint8_t*)ResampleLUT) + location);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 0) ^ 1)) * ((int32_t)((int16_t)lut[0])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 0) ^ 1)) * ((int32_t)((int16_t)lut[0])));
         accum = (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 1) ^ 1)) * ((int32_t)((int16_t)lut[1])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 1) ^ 1)) * ((int32_t)((int16_t)lut[1])));
         accum += (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 2) ^ 1)) * ((int32_t)((int16_t)lut[2])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 2) ^ 1)) * ((int32_t)((int16_t)lut[2])));
         accum += (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 3) ^ 1)) * ((int32_t)((int16_t)lut[3])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 3) ^ 1)) * ((int32_t)((int16_t)lut[3])));
         accum += (int32_t)(temp >> 15);
 
-        if (accum > 32767) accum = 32767;
-        if (accum < -32768) accum = -32768;
+        if (accum > 32767)
+            accum = 32767;
+        if (accum < -32768)
+            accum = -32768;
 
         dst[dstPtr ^ 1] = (int16_t)(accum);
         dstPtr++;
@@ -470,7 +492,7 @@ static void RESAMPLE2()
     for (int x = 0; x < 4; x++)
         ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1] = src[(srcPtr + x) ^ 1];
     *(uint16_t*)(rsp.RDRAM + addy + 10) = (uint16_t)Accum;
-    //memcpy (RSWORK, src+srcPtr, 0x8);
+    // memcpy (RSWORK, src+srcPtr, 0x8);
 }
 
 static void DMEMMOVE2()
@@ -482,13 +504,13 @@ static void DMEMMOVE2()
         return;
     v0 = (inst1 & 0xFFFF);
     v1 = (inst2 >> 0x10);
-    //assert ((v1 & 0x3) == 0);
-    //assert ((v0 & 0x3) == 0);
+    // assert ((v1 & 0x3) == 0);
+    // assert ((v0 & 0x3) == 0);
     uint32_t count = ((inst2 + 3) & 0xfffc);
-    //v0 = (v0) & 0xfffc;
-    //v1 = (v1) & 0xfffc;
+    // v0 = (v0) & 0xfffc;
+    // v1 = (v1) & 0xfffc;
 
-    //memcpy (dmem+v1, dmem+v0, count-1);
+    // memcpy (dmem+v1, dmem+v0, count-1);
     for (cnt = 0; cnt < count; cnt++)
     {
         *(uint8_t*)(BufferSpace + ((cnt + v1) ^ 3)) = *(uint8_t*)(BufferSpace + ((cnt + v0) ^ 3));
@@ -502,7 +524,7 @@ static void ENVSETUP1()
 {
     uint32_t tmp;
 
-    //fprintf (dfile, "ENVSETUP1: inst1 = %08X, inst2 = %08X\n", inst1, inst2);
+    // fprintf (dfile, "ENVSETUP1: inst1 = %08X, inst2 = %08X\n", inst1, inst2);
     t3 = inst1 & 0xFFFF;
     tmp = (inst1 >> 0x8) & 0xFF00;
     env[4] = (uint16_t)tmp;
@@ -510,14 +532,14 @@ static void ENVSETUP1()
     env[5] = (uint16_t)tmp;
     s5 = inst2 >> 0x10;
     s6 = inst2 & 0xFFFF;
-    //fprintf (dfile, "	t3 = %X / s5 = %X / s6 = %X / env[4] = %X / env[5] = %X\n", t3, s5, s6, env[4], env[5]);
+    // fprintf (dfile, "	t3 = %X / s5 = %X / s6 = %X / env[4] = %X / env[5] = %X\n", t3, s5, s6, env[4], env[5]);
 }
 
 static void ENVSETUP2()
 {
     uint32_t tmp;
 
-    //fprintf (dfile, "ENVSETUP2: inst1 = %08X, inst2 = %08X\n", inst1, inst2);
+    // fprintf (dfile, "ENVSETUP2: inst1 = %08X, inst2 = %08X\n", inst1, inst2);
     tmp = (inst2 >> 0x10);
     env[0] = (uint16_t)tmp;
     tmp += s5;
@@ -526,12 +548,12 @@ static void ENVSETUP2()
     env[2] = (uint16_t)tmp;
     tmp += s6;
     env[3] = (uint16_t)tmp;
-    //fprintf (dfile, "	env[0] = %X / env[1] = %X / env[2] = %X / env[3] = %X\n", env[0], env[1], env[2], env[3]);
+    // fprintf (dfile, "	env[0] = %X / env[1] = %X / env[2] = %X / env[3] = %X\n", env[0], env[1], env[2], env[3]);
 }
 
 static void ENVMIXER2()
 {
-    //fprintf (dfile, "ENVMIXER: inst1 = %08X, inst2 = %08X\n", inst1, inst2);
+    // fprintf (dfile, "ENVMIXER: inst1 = %08X, inst2 = %08X\n", inst1, inst2);
 
     int16_t *bufft6, *bufft7, *buffs0, *buffs1;
     int16_t* buffs3;
@@ -581,35 +603,47 @@ static void ENVMIXER2()
             vec9 = (int16_t)(((int32_t)buffs3[x ^ 1] * (uint32_t)env[0]) >> 0x10) ^ v2[0];
             vec10 = (int16_t)(((int32_t)buffs3[x ^ 1] * (uint32_t)env[2]) >> 0x10) ^ v2[1];
             temp = bufft6[x ^ 1] + vec9;
-            if (temp > 32767) temp = 32767;
-            if (temp < -32768) temp = -32768;
+            if (temp > 32767)
+                temp = 32767;
+            if (temp < -32768)
+                temp = -32768;
             bufft6[x ^ 1] = temp;
             temp = bufft7[x ^ 1] + vec10;
-            if (temp > 32767) temp = 32767;
-            if (temp < -32768) temp = -32768;
+            if (temp > 32767)
+                temp = 32767;
+            if (temp < -32768)
+                temp = -32768;
             bufft7[x ^ 1] = temp;
             vec9 = (int16_t)(((int32_t)vec9 * (uint32_t)env[4]) >> 0x10) ^ v2[2];
             vec10 = (int16_t)(((int32_t)vec10 * (uint32_t)env[4]) >> 0x10) ^ v2[3];
             if (inst1 & 0x10)
             {
                 temp = buffs0[x ^ 1] + vec10;
-                if (temp > 32767) temp = 32767;
-                if (temp < -32768) temp = -32768;
+                if (temp > 32767)
+                    temp = 32767;
+                if (temp < -32768)
+                    temp = -32768;
                 buffs0[x ^ 1] = temp;
                 temp = buffs1[x ^ 1] + vec9;
-                if (temp > 32767) temp = 32767;
-                if (temp < -32768) temp = -32768;
+                if (temp > 32767)
+                    temp = 32767;
+                if (temp < -32768)
+                    temp = -32768;
                 buffs1[x ^ 1] = temp;
             }
             else
             {
                 temp = buffs0[x ^ 1] + vec9;
-                if (temp > 32767) temp = 32767;
-                if (temp < -32768) temp = -32768;
+                if (temp > 32767)
+                    temp = 32767;
+                if (temp < -32768)
+                    temp = -32768;
                 buffs0[x ^ 1] = temp;
                 temp = buffs1[x ^ 1] + vec10;
-                if (temp > 32767) temp = 32767;
-                if (temp < -32768) temp = -32768;
+                if (temp > 32767)
+                    temp = 32767;
+                if (temp < -32768)
+                    temp = -32768;
                 buffs1[x ^ 1] = temp;
             }
         }
@@ -620,35 +654,47 @@ static void ENVMIXER2()
                 vec9 = (int16_t)(((int32_t)buffs3[x ^ 1] * (uint32_t)env[1]) >> 0x10) ^ v2[0];
                 vec10 = (int16_t)(((int32_t)buffs3[x ^ 1] * (uint32_t)env[3]) >> 0x10) ^ v2[1];
                 temp = bufft6[x ^ 1] + vec9;
-                if (temp > 32767) temp = 32767;
-                if (temp < -32768) temp = -32768;
+                if (temp > 32767)
+                    temp = 32767;
+                if (temp < -32768)
+                    temp = -32768;
                 bufft6[x ^ 1] = temp;
                 temp = bufft7[x ^ 1] + vec10;
-                if (temp > 32767) temp = 32767;
-                if (temp < -32768) temp = -32768;
+                if (temp > 32767)
+                    temp = 32767;
+                if (temp < -32768)
+                    temp = -32768;
                 bufft7[x ^ 1] = temp;
                 vec9 = (int16_t)(((int32_t)vec9 * (uint32_t)env[5]) >> 0x10) ^ v2[2];
                 vec10 = (int16_t)(((int32_t)vec10 * (uint32_t)env[5]) >> 0x10) ^ v2[3];
                 if (inst1 & 0x10)
                 {
                     temp = buffs0[x ^ 1] + vec10;
-                    if (temp > 32767) temp = 32767;
-                    if (temp < -32768) temp = -32768;
+                    if (temp > 32767)
+                        temp = 32767;
+                    if (temp < -32768)
+                        temp = -32768;
                     buffs0[x ^ 1] = temp;
                     temp = buffs1[x ^ 1] + vec9;
-                    if (temp > 32767) temp = 32767;
-                    if (temp < -32768) temp = -32768;
+                    if (temp > 32767)
+                        temp = 32767;
+                    if (temp < -32768)
+                        temp = -32768;
                     buffs1[x ^ 1] = temp;
                 }
                 else
                 {
                     temp = buffs0[x ^ 1] + vec9;
-                    if (temp > 32767) temp = 32767;
-                    if (temp < -32768) temp = -32768;
+                    if (temp > 32767)
+                        temp = 32767;
+                    if (temp < -32768)
+                        temp = -32768;
                     buffs0[x ^ 1] = temp;
                     temp = buffs1[x ^ 1] + vec10;
-                    if (temp > 32767) temp = 32767;
-                    if (temp < -32768) temp = -32768;
+                    if (temp > 32767)
+                        temp = 32767;
+                    if (temp < -32768)
+                        temp = -32768;
                     buffs1[x ^ 1] = temp;
                 }
             }
@@ -687,33 +733,33 @@ static void DUPLICATE2()
 
 /*
 static void INTERL2 () { // Make your own...
-	short Count = inst1 & 0xffff;
-	WORD  Out   = inst2 & 0xffff;
-	WORD In     = (inst2 >> 16);
+    short Count = inst1 & 0xffff;
+    WORD  Out   = inst2 & 0xffff;
+    WORD In     = (inst2 >> 16);
 
-	short *src,*dst,tmp;
-	src=(short *)&BufferSpace[In];
-	dst=(short *)&BufferSpace[Out];
-	while(Count)
-	{
-		*(dst++)=*(src++);
-		src++;
-		*(dst++)=*(src++);
-		src++;
-		*(dst++)=*(src++);
-		src++;
-		*(dst++)=*(src++);
-		src++;
-		*(dst++)=*(src++);
-		src++;
-		*(dst++)=*(src++);
-		src++;
-		*(dst++)=*(src++);
-		src++;
-		*(dst++)=*(src++);
-		src++;
-		Count-=8;
-	}
+    short *src,*dst,tmp;
+    src=(short *)&BufferSpace[In];
+    dst=(short *)&BufferSpace[Out];
+    while(Count)
+    {
+        *(dst++)=*(src++);
+        src++;
+        *(dst++)=*(src++);
+        src++;
+        *(dst++)=*(src++);
+        src++;
+        *(dst++)=*(src++);
+        src++;
+        *(dst++)=*(src++);
+        src++;
+        *(dst++)=*(src++);
+        src++;
+        *(dst++)=*(src++);
+        src++;
+        *(dst++)=*(src++);
+        src++;
+        Count-=8;
+    }
 }
 */
 
@@ -786,8 +832,10 @@ static void ADDMIXER()
     for (int cntr = 0; cntr < Count; cntr += 2)
     {
         temp = *outp + *inp;
-        if (temp > 32767) temp = 32767;
-        if (temp < -32768) temp = -32768;
+        if (temp > 32767)
+            temp = 32767;
+        if (temp < -32768)
+            temp = -32768;
         outp++;
         inp++;
     }
@@ -807,10 +855,12 @@ static void HILOGAIN()
     while (cnt)
     {
         val = (int32_t)*src;
-        //tmp = ((val * (int32_t)hi) + ((uint64_t)(val * lo) << 16) >> 16);
+        // tmp = ((val * (int32_t)hi) + ((uint64_t)(val * lo) << 16) >> 16);
         tmp = ((val * (int32_t)hi) >> 16) + (uint32_t)(val * lo);
-        if ((int32_t)tmp > 32767) tmp = 32767;
-        else if ((int32_t)tmp < -32768) tmp = -32768;
+        if ((int32_t)tmp > 32767)
+            tmp = 32767;
+        else if ((int32_t)tmp < -32768)
+            tmp = -32768;
         *src = tmp;
         src++;
         cnt -= 2;
@@ -931,14 +981,14 @@ static void FILTER2()
         out1[6] += inp2[4] * lutt6[3];
         out1[6] += inp2[7] * lutt6[0];
         out1[6] += inp2[6] * lutt6[1];
-        outp[1] = /*CLAMP*/((out1[1] + 0x4000) >> 0xF);
-        outp[0] = /*CLAMP*/((out1[0] + 0x4000) >> 0xF);
-        outp[3] = /*CLAMP*/((out1[3] + 0x4000) >> 0xF);
-        outp[2] = /*CLAMP*/((out1[2] + 0x4000) >> 0xF);
-        outp[5] = /*CLAMP*/((out1[5] + 0x4000) >> 0xF);
-        outp[4] = /*CLAMP*/((out1[4] + 0x4000) >> 0xF);
-        outp[7] = /*CLAMP*/((out1[7] + 0x4000) >> 0xF);
-        outp[6] = /*CLAMP*/((out1[6] + 0x4000) >> 0xF);
+        outp[1] = /*CLAMP*/ ((out1[1] + 0x4000) >> 0xF);
+        outp[0] = /*CLAMP*/ ((out1[0] + 0x4000) >> 0xF);
+        outp[3] = /*CLAMP*/ ((out1[3] + 0x4000) >> 0xF);
+        outp[2] = /*CLAMP*/ ((out1[2] + 0x4000) >> 0xF);
+        outp[5] = /*CLAMP*/ ((out1[5] + 0x4000) >> 0xF);
+        outp[4] = /*CLAMP*/ ((out1[4] + 0x4000) >> 0xF);
+        outp[7] = /*CLAMP*/ ((out1[7] + 0x4000) >> 0xF);
+        outp[6] = /*CLAMP*/ ((out1[6] + 0x4000) >> 0xF);
         inp1 = inp2;
         inp2 += 8;
         outp += 8;
@@ -958,7 +1008,7 @@ static void SEGMENT2()
     if ((inst1 & 0xffffff) == 0)
     {
         isMKABI = true;
-        //SEGMENTS[(inst2>>24)&0xf] = (inst2 & 0xffffff);
+        // SEGMENTS[(inst2>>24)&0xf] = (inst2 & 0xffffff);
     }
     else
     {
@@ -981,11 +1031,10 @@ void (*ABI2[0x20])() = {
 };*/
 
 void (*ABI2[0x20])() = {
-    SPNOOP, ADPCM2, CLEARBUFF2, UNKNOWN, ADDMIXER, RESAMPLE2, UNKNOWN, SEGMENT2,
-    SETBUFF2, DUPLICATE2, DMEMMOVE2, LOADADPCM2, MIXER2, INTERLEAVE2, HILOGAIN, SETLOOP2,
-    SPNOOP, INTERL2, ENVSETUP1, ENVMIXER2, LOADBUFF2, SAVEBUFF2, ENVSETUP2, SPNOOP,
-    HILOGAIN, SPNOOP, DUPLICATE2, UNKNOWN, SPNOOP, SPNOOP, SPNOOP, SPNOOP
-};
+SPNOOP, ADPCM2, CLEARBUFF2, UNKNOWN, ADDMIXER, RESAMPLE2, UNKNOWN, SEGMENT2,
+SETBUFF2, DUPLICATE2, DMEMMOVE2, LOADADPCM2, MIXER2, INTERLEAVE2, HILOGAIN, SETLOOP2,
+SPNOOP, INTERL2, ENVSETUP1, ENVMIXER2, LOADBUFF2, SAVEBUFF2, ENVSETUP2, SPNOOP,
+HILOGAIN, SPNOOP, DUPLICATE2, UNKNOWN, SPNOOP, SPNOOP, SPNOOP, SPNOOP};
 /*
 void (*ABI2[0x20])() = {
     SPNOOP , ADPCM2, CLEARBUFF2, SPNOOP, SPNOOP, RESAMPLE2  , SPNOOP  , SEGMENT2,

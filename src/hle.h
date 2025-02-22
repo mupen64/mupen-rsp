@@ -4,7 +4,7 @@
  *
  * Mupen64 homepage: http://mupen64.emulation64.com
  * email address: hacktarux@yahoo.fr
- * 
+ *
  * If you want to contribute to the project please contact
  * me first (maybe someone is already making what you are
  * planning to do).
@@ -25,7 +25,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
  * USA.
  *
-**/
+ **/
 
 #ifndef HLE_H
 #define HLE_H
@@ -40,23 +40,23 @@
 #define S8 3
 #endif
 
-//#define ACMD_SIZE               32
+// #define ACMD_SIZE               32
 /*
  * Audio flags
  */
 
-#define A_INIT			0x01
-#define A_CONTINUE		0x00
-#define A_LOOP          0x02
-#define A_OUT           0x02
-#define A_LEFT			0x02
-#define	A_RIGHT			0x00
-#define A_VOL			0x04
-#define A_RATE			0x00
-#define A_AUX			0x08
-#define A_NOAUX			0x00
-#define A_MAIN			0x00
-#define A_MIX			0x10
+#define A_INIT 0x01
+#define A_CONTINUE 0x00
+#define A_LOOP 0x02
+#define A_OUT 0x02
+#define A_LEFT 0x02
+#define A_RIGHT 0x00
+#define A_VOL 0x04
+#define A_RATE 0x00
+#define A_AUX 0x08
+#define A_NOAUX 0x00
+#define A_MAIN 0x00
+#define A_MIX 0x10
 
 extern RSP_INFO rsp;
 
@@ -98,6 +98,6 @@ extern uint32_t inst1, inst2;
 extern uint16_t AudioInBuffer, AudioOutBuffer, AudioCount;
 extern uint16_t AudioAuxA, AudioAuxC, AudioAuxE;
 extern uint32_t loopval; // Value set by A_SETLOOP : Possible conflict with SETVOLUME???
-//extern uint32_t UCData, UDataLen;
+// extern uint32_t UCData, UDataLen;
 
 #endif

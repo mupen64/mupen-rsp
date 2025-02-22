@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "hle.h"
-//#include "rsp.h"
-//#define SAFE_MEMORY
+// #include "rsp.h"
+// #define SAFE_MEMORY
 /*
 #ifndef SAFE_MEMORY
 #	define wr8 (src , address);
@@ -15,27 +15,27 @@
 #	define dmamem (dest, src, size) memcpy (dest, src, size);
 #	define clrmem (dest, size)		memset (dest, 0, size);
 #else
-	void wr8 (uint8_t src, void *address);
-	void rd8 (uint8_t dest, void *address);
-	void wr16 (uint16_t src, void *address);
-	void rd16 (uint16_t dest, void *address);
-	void wr32 (uint16_t src, void *address);
-	void rd32 (uint16_t dest, void *address);
-	void wr64 (uint16_t src, void *address);
-	void rd64 (uint16_t dest, void *address);
-	void dmamem (void *dest, void *src, int size);
-	void clrmem (void *dest, int size);
+    void wr8 (uint8_t src, void *address);
+    void rd8 (uint8_t dest, void *address);
+    void wr16 (uint16_t src, void *address);
+    void rd16 (uint16_t dest, void *address);
+    void wr32 (uint16_t src, void *address);
+    void rd32 (uint16_t dest, void *address);
+    void wr64 (uint16_t src, void *address);
+    void rd64 (uint16_t dest, void *address);
+    void dmamem (void *dest, void *src, int size);
+    void clrmem (void *dest, int size);
 #endif
 */
 /******** DMEM Memory Map for ABI 1 ***************
 Address/Range		Description
 -------------		-------------------------------
 0x000..0x2BF		UCodeData
-	0x000-0x00F		Constants  - 0000 0001 0002 FFFF 0020 0800 7FFF 4000
-	0x010-0x02F		Function Jump Table (16 Functions * 2 bytes each = 32) 0x20
-	0x030-0x03F		Constants  - F000 0F00 00F0 000F 0001 0010 0100 1000
-	0x040-0x03F		Used by the Envelope Mixer (But what for?)
-	0x070-0x07F		Used by the Envelope Mixer (But what for?)
+    0x000-0x00F		Constants  - 0000 0001 0002 FFFF 0020 0800 7FFF 4000
+    0x010-0x02F		Function Jump Table (16 Functions * 2 bytes each = 32) 0x20
+    0x030-0x03F		Constants  - F000 0F00 00F0 000F 0001 0010 0100 1000
+    0x040-0x03F		Used by the Envelope Mixer (But what for?)
+    0x070-0x07F		Used by the Envelope Mixer (But what for?)
 0x2C0..0x31F		<Unknown>
 0x320..0x35F		Segments
 0x360				Audio In Buffer (Location)
@@ -64,7 +64,7 @@ Address/Range		Description
 
 static void SPNOOP()
 {
-    //MessageBox (NULL, "Unknown Audio Command in ABI 1", "Audio HLE Error", MB_OK);
+    // MessageBox (NULL, "Unknown Audio Command in ABI 1", "Audio HLE Error", MB_OK);
 }
 
 uint32_t SEGMENTS[0x10]; // 0x0320
@@ -80,10 +80,10 @@ uint16_t AudioAuxE; // 0x000E(T8)
 uint32_t loopval; // 0x0010(T8) // Value set by A_SETLOOP : Possible conflict with SETVOLUME???
 int16_t VolTrg_Left; // 0x0010(T8)
 int32_t VolRamp_Left; // m_LeftVolTarget
-//uint16_t VolRate_Left;	// m_LeftVolRate
+// uint16_t VolRate_Left;	// m_LeftVolRate
 int16_t VolTrg_Right; // m_RightVol
 int32_t VolRamp_Right; // m_RightVolTarget
-//uint16_t VolRate_Right;	// m_RightVolRate
+// uint16_t VolRate_Right;	// m_RightVolRate
 int16_t Env_Dry; // 0x001C(T8)
 int16_t Env_Wet; // 0x001E(T8)
 
@@ -93,54 +93,53 @@ short hleMixerWorkArea[256];
 uint16_t adpcmtable[0x88];
 
 uint16_t ResampleLUT[0x200] = {
-    0x0C39, 0x66AD, 0x0D46, 0xFFDF, 0x0B39, 0x6696, 0x0E5F, 0xFFD8,
-    0x0A44, 0x6669, 0x0F83, 0xFFD0, 0x095A, 0x6626, 0x10B4, 0xFFC8,
-    0x087D, 0x65CD, 0x11F0, 0xFFBF, 0x07AB, 0x655E, 0x1338, 0xFFB6,
-    0x06E4, 0x64D9, 0x148C, 0xFFAC, 0x0628, 0x643F, 0x15EB, 0xFFA1,
-    0x0577, 0x638F, 0x1756, 0xFF96, 0x04D1, 0x62CB, 0x18CB, 0xFF8A,
-    0x0435, 0x61F3, 0x1A4C, 0xFF7E, 0x03A4, 0x6106, 0x1BD7, 0xFF71,
-    0x031C, 0x6007, 0x1D6C, 0xFF64, 0x029F, 0x5EF5, 0x1F0B, 0xFF56,
-    0x022A, 0x5DD0, 0x20B3, 0xFF48, 0x01BE, 0x5C9A, 0x2264, 0xFF3A,
-    0x015B, 0x5B53, 0x241E, 0xFF2C, 0x0101, 0x59FC, 0x25E0, 0xFF1E,
-    0x00AE, 0x5896, 0x27A9, 0xFF10, 0x0063, 0x5720, 0x297A, 0xFF02,
-    0x001F, 0x559D, 0x2B50, 0xFEF4, 0xFFE2, 0x540D, 0x2D2C, 0xFEE8,
-    0xFFAC, 0x5270, 0x2F0D, 0xFEDB, 0xFF7C, 0x50C7, 0x30F3, 0xFED0,
-    0xFF53, 0x4F14, 0x32DC, 0xFEC6, 0xFF2E, 0x4D57, 0x34C8, 0xFEBD,
-    0xFF0F, 0x4B91, 0x36B6, 0xFEB6, 0xFEF5, 0x49C2, 0x38A5, 0xFEB0,
-    0xFEDF, 0x47ED, 0x3A95, 0xFEAC, 0xFECE, 0x4611, 0x3C85, 0xFEAB,
-    0xFEC0, 0x4430, 0x3E74, 0xFEAC, 0xFEB6, 0x424A, 0x4060, 0xFEAF,
-    0xFEAF, 0x4060, 0x424A, 0xFEB6, 0xFEAC, 0x3E74, 0x4430, 0xFEC0,
-    0xFEAB, 0x3C85, 0x4611, 0xFECE, 0xFEAC, 0x3A95, 0x47ED, 0xFEDF,
-    0xFEB0, 0x38A5, 0x49C2, 0xFEF5, 0xFEB6, 0x36B6, 0x4B91, 0xFF0F,
-    0xFEBD, 0x34C8, 0x4D57, 0xFF2E, 0xFEC6, 0x32DC, 0x4F14, 0xFF53,
-    0xFED0, 0x30F3, 0x50C7, 0xFF7C, 0xFEDB, 0x2F0D, 0x5270, 0xFFAC,
-    0xFEE8, 0x2D2C, 0x540D, 0xFFE2, 0xFEF4, 0x2B50, 0x559D, 0x001F,
-    0xFF02, 0x297A, 0x5720, 0x0063, 0xFF10, 0x27A9, 0x5896, 0x00AE,
-    0xFF1E, 0x25E0, 0x59FC, 0x0101, 0xFF2C, 0x241E, 0x5B53, 0x015B,
-    0xFF3A, 0x2264, 0x5C9A, 0x01BE, 0xFF48, 0x20B3, 0x5DD0, 0x022A,
-    0xFF56, 0x1F0B, 0x5EF5, 0x029F, 0xFF64, 0x1D6C, 0x6007, 0x031C,
-    0xFF71, 0x1BD7, 0x6106, 0x03A4, 0xFF7E, 0x1A4C, 0x61F3, 0x0435,
-    0xFF8A, 0x18CB, 0x62CB, 0x04D1, 0xFF96, 0x1756, 0x638F, 0x0577,
-    0xFFA1, 0x15EB, 0x643F, 0x0628, 0xFFAC, 0x148C, 0x64D9, 0x06E4,
-    0xFFB6, 0x1338, 0x655E, 0x07AB, 0xFFBF, 0x11F0, 0x65CD, 0x087D,
-    0xFFC8, 0x10B4, 0x6626, 0x095A, 0xFFD0, 0x0F83, 0x6669, 0x0A44,
-    0xFFD8, 0x0E5F, 0x6696, 0x0B39, 0xFFDF, 0x0D46, 0x66AD, 0x0C39
-};
+0x0C39, 0x66AD, 0x0D46, 0xFFDF, 0x0B39, 0x6696, 0x0E5F, 0xFFD8,
+0x0A44, 0x6669, 0x0F83, 0xFFD0, 0x095A, 0x6626, 0x10B4, 0xFFC8,
+0x087D, 0x65CD, 0x11F0, 0xFFBF, 0x07AB, 0x655E, 0x1338, 0xFFB6,
+0x06E4, 0x64D9, 0x148C, 0xFFAC, 0x0628, 0x643F, 0x15EB, 0xFFA1,
+0x0577, 0x638F, 0x1756, 0xFF96, 0x04D1, 0x62CB, 0x18CB, 0xFF8A,
+0x0435, 0x61F3, 0x1A4C, 0xFF7E, 0x03A4, 0x6106, 0x1BD7, 0xFF71,
+0x031C, 0x6007, 0x1D6C, 0xFF64, 0x029F, 0x5EF5, 0x1F0B, 0xFF56,
+0x022A, 0x5DD0, 0x20B3, 0xFF48, 0x01BE, 0x5C9A, 0x2264, 0xFF3A,
+0x015B, 0x5B53, 0x241E, 0xFF2C, 0x0101, 0x59FC, 0x25E0, 0xFF1E,
+0x00AE, 0x5896, 0x27A9, 0xFF10, 0x0063, 0x5720, 0x297A, 0xFF02,
+0x001F, 0x559D, 0x2B50, 0xFEF4, 0xFFE2, 0x540D, 0x2D2C, 0xFEE8,
+0xFFAC, 0x5270, 0x2F0D, 0xFEDB, 0xFF7C, 0x50C7, 0x30F3, 0xFED0,
+0xFF53, 0x4F14, 0x32DC, 0xFEC6, 0xFF2E, 0x4D57, 0x34C8, 0xFEBD,
+0xFF0F, 0x4B91, 0x36B6, 0xFEB6, 0xFEF5, 0x49C2, 0x38A5, 0xFEB0,
+0xFEDF, 0x47ED, 0x3A95, 0xFEAC, 0xFECE, 0x4611, 0x3C85, 0xFEAB,
+0xFEC0, 0x4430, 0x3E74, 0xFEAC, 0xFEB6, 0x424A, 0x4060, 0xFEAF,
+0xFEAF, 0x4060, 0x424A, 0xFEB6, 0xFEAC, 0x3E74, 0x4430, 0xFEC0,
+0xFEAB, 0x3C85, 0x4611, 0xFECE, 0xFEAC, 0x3A95, 0x47ED, 0xFEDF,
+0xFEB0, 0x38A5, 0x49C2, 0xFEF5, 0xFEB6, 0x36B6, 0x4B91, 0xFF0F,
+0xFEBD, 0x34C8, 0x4D57, 0xFF2E, 0xFEC6, 0x32DC, 0x4F14, 0xFF53,
+0xFED0, 0x30F3, 0x50C7, 0xFF7C, 0xFEDB, 0x2F0D, 0x5270, 0xFFAC,
+0xFEE8, 0x2D2C, 0x540D, 0xFFE2, 0xFEF4, 0x2B50, 0x559D, 0x001F,
+0xFF02, 0x297A, 0x5720, 0x0063, 0xFF10, 0x27A9, 0x5896, 0x00AE,
+0xFF1E, 0x25E0, 0x59FC, 0x0101, 0xFF2C, 0x241E, 0x5B53, 0x015B,
+0xFF3A, 0x2264, 0x5C9A, 0x01BE, 0xFF48, 0x20B3, 0x5DD0, 0x022A,
+0xFF56, 0x1F0B, 0x5EF5, 0x029F, 0xFF64, 0x1D6C, 0x6007, 0x031C,
+0xFF71, 0x1BD7, 0x6106, 0x03A4, 0xFF7E, 0x1A4C, 0x61F3, 0x0435,
+0xFF8A, 0x18CB, 0x62CB, 0x04D1, 0xFF96, 0x1756, 0x638F, 0x0577,
+0xFFA1, 0x15EB, 0x643F, 0x0628, 0xFFAC, 0x148C, 0x64D9, 0x06E4,
+0xFFB6, 0x1338, 0x655E, 0x07AB, 0xFFBF, 0x11F0, 0x65CD, 0x087D,
+0xFFC8, 0x10B4, 0x6626, 0x095A, 0xFFD0, 0x0F83, 0x6669, 0x0A44,
+0xFFD8, 0x0E5F, 0x6696, 0x0B39, 0xFFDF, 0x0D46, 0x66AD, 0x0C39};
 
 static void CLEARBUFF()
 {
     uint32_t addr = (uint32_t)(inst1 & 0xffff);
     uint32_t count = (uint32_t)(inst2 & 0xffff);
     addr &= 0xFFFC;
-    //#ifndef SAFE_MEMORY
+    // #ifndef SAFE_MEMORY
 #if 1
     memset(BufferSpace + addr, 0, (count + 3) & 0xFFFC);
 #else
-	__asm {
+    __asm {
 		mov ecx, dword ptr [count];
 		add edx, dword ptr [addr];
 		mov eax, dword ptr [BufferSpace];
-		//add edx, 05c0h;
+        // add edx, 05c0h;
 		push edi
 moretodo:
 		test ecx, ecx;
@@ -153,19 +152,19 @@ moretodo:
 		jmp moretodo
 isDoneNow:
 		pop edi;
-	}
+    }
 #endif
 }
 
-//FILE *dfile = fopen ("d:\\envmix.txt", "wt");
+// FILE *dfile = fopen ("d:\\envmix.txt", "wt");
 
 static void ENVMIXER()
 {
-    //static int envmixcnt = 0;
+    // static int envmixcnt = 0;
     uint8_t flags = (uint8_t)((inst1 >> 16) & 0xff);
     uint32_t addy = (inst2 & 0xFFFFFF); // + SEGMENTS[(inst2>>24)&0xf];
-    //static
-    // ********* Make sure these conditions are met... ***********
+    // static
+    //  ********* Make sure these conditions are met... ***********
     /*if ((AudioInBuffer | AudioOutBuffer | AudioAuxA | AudioAuxC | AudioAuxE | AudioCount) & 0x3) {
         MessageBox (NULL, "Unaligned EnvMixer... please report this to Azimer with the following information: RomTitle, Place in the rom it occurred, and any save state just before the error", "AudioHLE Error", MB_OK);
     }*/
@@ -192,9 +191,9 @@ static void ENVMIXER()
     int32_t LAdderStart, RAdderStart, LAdderEnd, RAdderEnd;
     int32_t oMainR, oMainL, oAuxR, oAuxL;
 
-    //envmixcnt++;
+    // envmixcnt++;
 
-    //fprintf (dfile, "\n----------------------------------------------------\n");
+    // fprintf (dfile, "\n----------------------------------------------------\n");
     if (flags & A_INIT)
     {
         LVol = ((Vol_Left * (int32_t)VolRamp_Left));
@@ -308,8 +307,8 @@ static void ENVMIXER()
                 a3 = (int)aux3[ptr ^ 1];
             }
             // TODO: here...
-            //LAcc = LTrg;
-            //RAcc = RTrg;
+            // LAcc = LTrg;
+            // RAcc = RTrg;
 
             LAcc += LVol;
             RAcc += RVol;
@@ -378,7 +377,7 @@ static void ENVMIXER()
                 }
             }
 
-            //fprintf (dfile, "%04X ", (LAcc>>16));
+            // fprintf (dfile, "%04X ", (LAcc>>16));
 
             /*MainL = (((int64_t)Dry*2 * (int64_t)(LAcc>>16)) + 0x8000) >> 16;
             MainR = (((int64_t)Dry*2 * (int64_t)(RAcc>>16)) + 0x8000) >> 16;
@@ -399,34 +398,42 @@ static void ENVMIXER()
             AuxR  = (Wet * RTrg + 0x8000)  >> 16;
             AuxL  = (Wet * LTrg + 0x8000)  >> 16;*/
 
-            o1 += (/*(o1*0x7fff)+*/(i1 * MainR) + 0x4000) >> 15;
-            a1 += (/*(a1*0x7fff)+*/(i1 * MainL) + 0x4000) >> 15;
+            o1 += (/*(o1*0x7fff)+*/ (i1 * MainR) + 0x4000) >> 15;
+            a1 += (/*(a1*0x7fff)+*/ (i1 * MainL) + 0x4000) >> 15;
 
             /*		o1=((int64_t)(((int64_t)o1*0xfffe)+((int64_t)i1*MainR*2)+0x8000)>>16);
-            
+
                     a1=((int64_t)(((int64_t)a1*0xfffe)+((int64_t)i1*MainL*2)+0x8000)>>16);*/
 
-            if (o1 > 32767) o1 = 32767;
-            else if (o1 < -32768) o1 = -32768;
+            if (o1 > 32767)
+                o1 = 32767;
+            else if (o1 < -32768)
+                o1 = -32768;
 
-            if (a1 > 32767) a1 = 32767;
-            else if (a1 < -32768) a1 = -32768;
+            if (a1 > 32767)
+                a1 = 32767;
+            else if (a1 < -32768)
+                a1 = -32768;
 
             out[ptr ^ 1] = o1;
             aux1[ptr ^ 1] = a1;
             if (AuxIncRate)
             {
-                //a2=((int64_t)(((int64_t)a2*0xfffe)+((int64_t)i1*AuxR*2)+0x8000)>>16);
+                // a2=((int64_t)(((int64_t)a2*0xfffe)+((int64_t)i1*AuxR*2)+0x8000)>>16);
 
-                //a3=((int64_t)(((int64_t)a3*0xfffe)+((int64_t)i1*AuxL*2)+0x8000)>>16);
-                a2 += (/*(a2*0x7fff)+*/(i1 * AuxR) + 0x4000) >> 15;
-                a3 += (/*(a3*0x7fff)+*/(i1 * AuxL) + 0x4000) >> 15;
+                // a3=((int64_t)(((int64_t)a3*0xfffe)+((int64_t)i1*AuxL*2)+0x8000)>>16);
+                a2 += (/*(a2*0x7fff)+*/ (i1 * AuxR) + 0x4000) >> 15;
+                a3 += (/*(a3*0x7fff)+*/ (i1 * AuxL) + 0x4000) >> 15;
 
-                if (a2 > 32767) a2 = 32767;
-                else if (a2 < -32768) a2 = -32768;
+                if (a2 > 32767)
+                    a2 = 32767;
+                else if (a2 < -32768)
+                    a2 = -32768;
 
-                if (a3 > 32767) a3 = 32767;
-                else if (a3 < -32768) a3 = -32768;
+                if (a3 > 32767)
+                    a3 = 32767;
+                else if (a3 < -32768)
+                    a3 = -32768;
 
                 aux2[ptr ^ 1] = a2;
                 aux3[ptr ^ 1] = a3;
@@ -506,17 +513,25 @@ static void ENVMIXERo()
         a1 = ((a1 * 0x7fff) + (i1 * MainL) + 0x10000) >> 15;
         a3 = ((a3 * 0x7fff) + (i1 * AuxL) + 0x8000) >> 16;
 
-        if (o1 > 32767) o1 = 32767;
-        else if (o1 < -32768) o1 = -32768;
+        if (o1 > 32767)
+            o1 = 32767;
+        else if (o1 < -32768)
+            o1 = -32768;
 
-        if (a1 > 32767) a1 = 32767;
-        else if (a1 < -32768) a1 = -32768;
+        if (a1 > 32767)
+            a1 = 32767;
+        else if (a1 < -32768)
+            a1 = -32768;
 
-        if (a2 > 32767) a2 = 32767;
-        else if (a2 < -32768) a2 = -32768;
+        if (a2 > 32767)
+            a2 = 32767;
+        else if (a2 < -32768)
+            a2 = -32768;
 
-        if (a3 > 32767) a3 = 32767;
-        else if (a3 < -32768) a3 = -32768;
+        if (a3 > 32767)
+            a3 = 32767;
+        else if (a3 < -32768)
+            a3 = -32768;
 
         *(out++) = o1;
         *(aux1++) = a1;
@@ -556,7 +571,7 @@ static void RESAMPLE()
 
     if ((Flags & 0x1) == 0)
     {
-        //memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
+        // memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
         for (int x = 0; x < 4; x++)
             src[(srcPtr + x) ^ 1] = ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1];
         Accum = *(uint16_t*)(rsp.RDRAM + addy + 10);
@@ -576,7 +591,7 @@ static void RESAMPLE()
 
     for (int i = 0; i < ((AudioCount + 0xf) & 0xFFF0) / 2; i++)
     {
-        //location = (((Accum * 0x40) >> 0x10) * 8);
+        // location = (((Accum * 0x40) >> 0x10) * 8);
         location = (Accum >> 0xa) << 0x3;
         lut = (int16_t*)(((uint8_t*)ResampleLUT) + location);
 
@@ -592,20 +607,22 @@ static void RESAMPLE()
         // and edx, 0f000h
 
         // imul
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 0) ^ 1)) * ((int32_t)((int16_t)lut[0])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 0) ^ 1)) * ((int32_t)((int16_t)lut[0])));
         accum = (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 1) ^ 1)) * ((int32_t)((int16_t)lut[1])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 1) ^ 1)) * ((int32_t)((int16_t)lut[1])));
         accum += (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 2) ^ 1)) * ((int32_t)((int16_t)lut[2])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 2) ^ 1)) * ((int32_t)((int16_t)lut[2])));
         accum += (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 3) ^ 1)) * ((int32_t)((int16_t)lut[3])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 3) ^ 1)) * ((int32_t)((int16_t)lut[3])));
         accum += (int32_t)(temp >> 15);
 
-        if (accum > 32767) accum = 32767;
-        if (accum < -32768) accum = -32768;
+        if (accum > 32767)
+            accum = 32767;
+        if (accum < -32768)
+            accum = -32768;
 
         dst[dstPtr ^ 1] = (accum);
         dstPtr++;
@@ -615,7 +632,7 @@ static void RESAMPLE()
     }
     for (int x = 0; x < 4; x++)
         ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1] = src[(srcPtr + x) ^ 1];
-    //memcpy (RSWORK, src+srcPtr, 0x8);
+    // memcpy (RSWORK, src+srcPtr, 0x8);
     *(uint16_t*)(rsp.RDRAM + addy + 10) = Accum;
 }
 
@@ -649,31 +666,31 @@ static void SETVOL()
         return;
     }
 
-    //0x370				Loop Value (shared location)
-    //0x370				Target Volume (Left)
-    //uint16_t VolRamp_Left;	// 0x0012(T8)
+    // 0x370				Loop Value (shared location)
+    // 0x370				Target Volume (Left)
+    // uint16_t VolRamp_Left;	// 0x0012(T8)
     if (flags & A_LEFT)
     {
         // Set the Ramping values Target, Ramp
-        //loopval = (((uint32_t)vol << 0x10) | (uint32_t)voltarg);
+        // loopval = (((uint32_t)vol << 0x10) | (uint32_t)voltarg);
         VolTrg_Left = *(int16_t*)&inst1; // m_LeftVol
-        //VolRamp_Left = (int32_t)inst2;
+        // VolRamp_Left = (int32_t)inst2;
         VolRamp_Left = *(int32_t*)&inst2; //(uint16_t)(inst2) | (int32_t)(int16_t)(inst2 << 0x10);
-        //fprintf (dfile, "Ramp Left: %f\n", (float)VolRamp_Left/65536.0);
-        //fprintf (dfile, "Ramp Left: %08X\n", inst2);
-        //VolRamp_Left = (int16_t)voltarg;	// m_LeftVolTarget
-        //VolRate_Left = (int16_t)volrate;	// m_LeftVolRate
+        // fprintf (dfile, "Ramp Left: %f\n", (float)VolRamp_Left/65536.0);
+        // fprintf (dfile, "Ramp Left: %08X\n", inst2);
+        // VolRamp_Left = (int16_t)voltarg;	// m_LeftVolTarget
+        // VolRate_Left = (int16_t)volrate;	// m_LeftVolRate
     }
     else
     {
         // A_RIGHT
         VolTrg_Right = *(int16_t*)&inst1; // m_RightVol
-        //VolRamp_Right = (int32_t)inst2;
+        // VolRamp_Right = (int32_t)inst2;
         VolRamp_Right = *(int32_t*)&inst2; //(uint16_t)(inst2 >> 0x10) | (int32_t)(int16_t)(inst2 << 0x10);
-        //fprintf (dfile, "Ramp Right: %f\n", (float)VolRamp_Right/65536.0);
-        //fprintf (dfile, "Ramp Right: %08X\n", inst2);
-        //VolRamp_Right = (int16_t)voltarg;	// m_RightVolTarget
-        //VolRate_Right = (int16_t)volrate;	// m_RightVolRate
+        // fprintf (dfile, "Ramp Right: %f\n", (float)VolRamp_Right/65536.0);
+        // fprintf (dfile, "Ramp Right: %08X\n", inst2);
+        // VolRamp_Right = (int16_t)voltarg;	// m_RightVolTarget
+        // VolRate_Right = (int16_t)volrate;	// m_RightVolRate
     }
 }
 
@@ -684,19 +701,19 @@ static void UNKNOWN()
 static void SETLOOP()
 {
     loopval = (inst2 & 0xffffff); // + SEGMENTS[(inst2>>24)&0xf];
-    //VolTrg_Left  = (int16_t)(loopval>>16);		// m_LeftVol
-    //VolRamp_Left = (int16_t)(loopval);	// m_LeftVolTarget
+    // VolTrg_Left  = (int16_t)(loopval>>16);		// m_LeftVol
+    // VolRamp_Left = (int16_t)(loopval);	// m_LeftVolTarget
 }
 
 /*
 void assert(bool _a_)	{
-	if (!(_a_)) {
-		char szError [512];
-		sprintf(szError,"PC = %08X\n\nError localized at...\n\n  Line:\t %d\n  File:\t %s\n  Time:\t %s\n\nIgnore and continue?",sp_reg_pc, __LINE__,__FILE__,__TIMESTAMP__);
-		MessageBox (NULL, szError, "Assert", MB_OK);
-		__asm int 3;
-		rsp_reg.halt = 1;
-	}
+    if (!(_a_)) {
+        char szError [512];
+        sprintf(szError,"PC = %08X\n\nError localized at...\n\n  Line:\t %d\n  File:\t %s\n  Time:\t %s\n\nIgnore and continue?",sp_reg_pc, __LINE__,__FILE__,__TIMESTAMP__);
+        MessageBox (NULL, szError, "Assert", MB_OK);
+        __asm int 3;
+        rsp_reg.halt = 1;
+    }
 }
 */
 
@@ -707,7 +724,7 @@ static void ADPCM()
     WORD Gain = (uint16_t)(inst1 & 0xffff);
     DWORD Address = (inst2 & 0xffffff); // + SEGMENTS[(inst2>>24)&0xf];
     WORD inPtr = 0;
-    //short *out=(int16_t *)(testbuff+(AudioOutBuffer>>2));
+    // short *out=(int16_t *)(testbuff+(AudioOutBuffer>>2));
     short* out = (short*)(BufferSpace + AudioOutBuffer);
     BYTE* in = (BYTE*)(BufferSpace + AudioInBuffer);
     short count = (short)AudioCount;
@@ -867,8 +884,10 @@ static void ADPCM()
         for (j = 0; j < 8; j++)
         {
             a[j ^ 1] >>= 11;
-            if (a[j ^ 1] > 32767) a[j ^ 1] = 32767;
-            else if (a[j ^ 1] < -32768) a[j ^ 1] = -32768;
+            if (a[j ^ 1] > 32767)
+                a[j ^ 1] = 32767;
+            else if (a[j ^ 1] < -32768)
+                a[j ^ 1] = -32768;
             *(out++) = a[j ^ 1];
         }
         l1 = a[6];
@@ -937,8 +956,10 @@ static void ADPCM()
         for (j = 0; j < 8; j++)
         {
             a[j ^ 1] >>= 11;
-            if (a[j ^ 1] > 32767) a[j ^ 1] = 32767;
-            else if (a[j ^ 1] < -32768) a[j ^ 1] = -32768;
+            if (a[j ^ 1] > 32767)
+                a[j ^ 1] = 32767;
+            else if (a[j ^ 1] < -32768)
+                a[j ^ 1] = -32768;
             *(out++) = a[j ^ 1];
         }
         l1 = a[6];
@@ -1009,13 +1030,13 @@ static void DMEMMOVE()
         return;
     v0 = (inst1 & 0xFFFF);
     v1 = (inst2 >> 0x10);
-    //assert ((v1 & 0x3) == 0);
-    //assert ((v0 & 0x3) == 0);
+    // assert ((v1 & 0x3) == 0);
+    // assert ((v0 & 0x3) == 0);
     uint32_t count = ((inst2 + 3) & 0xfffc);
-    //v0 = (v0) & 0xfffc;
-    //v1 = (v1) & 0xfffc;
+    // v0 = (v0) & 0xfffc;
+    // v1 = (v1) & 0xfffc;
 
-    //memcpy (BufferSpace+v1, BufferSpace+v0, count-1);
+    // memcpy (BufferSpace+v1, BufferSpace+v0, count-1);
     for (cnt = 0; cnt < count; cnt++)
     {
         *(uint8_t*)(BufferSpace + ((cnt + v1) ^ 3)) = *(uint8_t*)(BufferSpace + ((cnt + v0) ^ 3));
@@ -1029,8 +1050,8 @@ static void LOADADPCM()
     v0 = (inst2 & 0xffffff); // + SEGMENTS[(inst2>>24)&0xf];
     /*	if (v0 > (1024*1024*8))
             v0 = (inst2 & 0xffffff);*/
-    //memcpy (dmem+0x4c0, rsp.RDRAM+v0, inst1&0xffff); // Could prolly get away with not putting this in dmem
-    //assert ((inst1&0xffff) <= 0x80);
+    // memcpy (dmem+0x4c0, rsp.RDRAM+v0, inst1&0xffff); // Could prolly get away with not putting this in dmem
+    // assert ((inst1&0xffff) <= 0x80);
     uint16_t* table = (uint16_t*)(rsp.RDRAM + v0);
     for (uint32_t x = 0; x < ((inst1 & 0xffff) >> 0x4); x++)
     {
@@ -1106,55 +1127,54 @@ static void MIXER()
 }
 
 // TOP Performance Hogs:
-//Command: ADPCM    - Calls:  48 - Total Time: 331226 - Avg Time:  6900.54 - Percent: 31.53%
-//Command: ENVMIXER - Calls:  48 - Total Time: 408563 - Avg Time:  8511.73 - Percent: 38.90%
-//Command: LOADBUFF - Calls:  56 - Total Time:  21551 - Avg Time:   384.84 - Percent:  2.05%
-//Command: RESAMPLE - Calls:  48 - Total Time: 225922 - Avg Time:  4706.71 - Percent: 21.51%
+// Command: ADPCM    - Calls:  48 - Total Time: 331226 - Avg Time:  6900.54 - Percent: 31.53%
+// Command: ENVMIXER - Calls:  48 - Total Time: 408563 - Avg Time:  8511.73 - Percent: 38.90%
+// Command: LOADBUFF - Calls:  56 - Total Time:  21551 - Avg Time:   384.84 - Percent:  2.05%
+// Command: RESAMPLE - Calls:  48 - Total Time: 225922 - Avg Time:  4706.71 - Percent: 21.51%
 
-//Command: ADPCM    - Calls:  48 - Total Time: 391600 - Avg Time:  8158.33 - Percent: 32.52%
-//Command: ENVMIXER - Calls:  48 - Total Time: 444091 - Avg Time:  9251.90 - Percent: 36.88%
-//Command: LOADBUFF - Calls:  58 - Total Time:  29945 - Avg Time:   516.29 - Percent:  2.49%
-//Command: RESAMPLE - Calls:  48 - Total Time: 276354 - Avg Time:  5757.38 - Percent: 22.95%
+// Command: ADPCM    - Calls:  48 - Total Time: 391600 - Avg Time:  8158.33 - Percent: 32.52%
+// Command: ENVMIXER - Calls:  48 - Total Time: 444091 - Avg Time:  9251.90 - Percent: 36.88%
+// Command: LOADBUFF - Calls:  58 - Total Time:  29945 - Avg Time:   516.29 - Percent:  2.49%
+// Command: RESAMPLE - Calls:  48 - Total Time: 276354 - Avg Time:  5757.38 - Percent: 22.95%
 
 
 void (*ABI1[0x20])() = {
-    // TOP Performace Hogs: MIXER, RESAMPLE, ENVMIXER
-    SPNOOP, ADPCM, CLEARBUFF, ENVMIXER, LOADBUFF, RESAMPLE, SAVEBUFF, UNKNOWN,
-    SETBUFF, SETVOL, DMEMMOVE, LOADADPCM, MIXER, INTERLEAVE, UNKNOWN, SETLOOP,
-    SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP,
-    SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP
-};
+// TOP Performace Hogs: MIXER, RESAMPLE, ENVMIXER
+SPNOOP, ADPCM, CLEARBUFF, ENVMIXER, LOADBUFF, RESAMPLE, SAVEBUFF, UNKNOWN,
+SETBUFF, SETVOL, DMEMMOVE, LOADADPCM, MIXER, INTERLEAVE, UNKNOWN, SETLOOP,
+SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP,
+SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP};
 
 /*  BACKUPS
 void MIXER () { // Fixed a sign issue... 03-14-01
-	uint16_t dmemin  = (uint16_t)(inst2 >> 0x10);
-	uint16_t dmemout = (uint16_t)(inst2 & 0xFFFF);
-	uint16_t gain    = (uint16_t)(inst1 & 0xFFFF);
-	uint8_t  flags   = (uint8_t)((inst1 >> 16) & 0xff);
-	uint64_t temp;
+    uint16_t dmemin  = (uint16_t)(inst2 >> 0x10);
+    uint16_t dmemout = (uint16_t)(inst2 & 0xFFFF);
+    uint16_t gain    = (uint16_t)(inst1 & 0xFFFF);
+    uint8_t  flags   = (uint8_t)((inst1 >> 16) & 0xff);
+    uint64_t temp;
 
-	if (AudioCount == 0)
-		return;
+    if (AudioCount == 0)
+        return;
 
-	for (int x=0; x < AudioCount; x+=2) { // I think I can do this a lot easier
-		temp = (int64_t)(*(int16_t *)(BufferSpace+dmemout+x)) * (int64_t)((int16_t)(0x7FFF)*2);
+    for (int x=0; x < AudioCount; x+=2) { // I think I can do this a lot easier
+        temp = (int64_t)(*(int16_t *)(BufferSpace+dmemout+x)) * (int64_t)((int16_t)(0x7FFF)*2);
 
-		if (temp & 0x8000)
-			temp = (temp^0x8000) + 0x10000;
-		else
-			temp = (temp^0x8000);
+        if (temp & 0x8000)
+            temp = (temp^0x8000) + 0x10000;
+        else
+            temp = (temp^0x8000);
 
-		temp = (temp & 0xFFFFFFFFFFFF);
+        temp = (temp & 0xFFFFFFFFFFFF);
 
-		temp += ((*(int16_t *)(BufferSpace+dmemin+x) * (int64_t)((int16_t)gain*2))) & 0xFFFFFFFFFFFF;
-			
-		temp = (int32_t)(temp >> 16);
-		if ((int32_t)temp > 32767) 
-			temp = 32767;
-		if ((int32_t)temp < -32768) 
-			temp = -32768;
+        temp += ((*(int16_t *)(BufferSpace+dmemin+x) * (int64_t)((int16_t)gain*2))) & 0xFFFFFFFFFFFF;
 
-		*(uint16_t *)(BufferSpace+dmemout+x) = (uint16_t)(temp & 0xFFFF);
-	}
+        temp = (int32_t)(temp >> 16);
+        if ((int32_t)temp > 32767)
+            temp = 32767;
+        if ((int32_t)temp < -32768)
+            temp = -32768;
+
+        *(uint16_t *)(BufferSpace+dmemout+x) = (uint16_t)(temp & 0xFFFF);
+    }
 }
 */

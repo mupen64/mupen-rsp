@@ -7,17 +7,17 @@ HWND get_emu_window()
 {
     HWND hwnd = nullptr;
 
-    EnumWindows([](const HWND hwnd, const LPARAM l_param) -> BOOL
-    {
+    EnumWindows([](const HWND hwnd, const LPARAM l_param) -> BOOL {
         DWORD pid;
         GetWindowThreadProcessId(hwnd, &pid);
-        if (pid == GetCurrentProcessId() && hwnd == GetAncestor(hwnd,GA_ROOT))
+        if (pid == GetCurrentProcessId() && hwnd == GetAncestor(hwnd, GA_ROOT))
         {
             *reinterpret_cast<HWND*>(l_param) = hwnd;
             return FALSE;
         }
         return TRUE;
-    }, reinterpret_cast<LPARAM>(&hwnd));
+    },
+                reinterpret_cast<LPARAM>(&hwnd));
 
     return hwnd;
 }

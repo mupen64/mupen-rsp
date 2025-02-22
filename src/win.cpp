@@ -33,16 +33,18 @@ std::string get_app_full_path()
 
 char* getExtension(char* str)
 {
-    if (strlen(str) > 3) return str + strlen(str) - 3;
-    else return NULL;
+    if (strlen(str) > 3)
+        return str + strlen(str) - 3;
+    else
+        return NULL;
 }
 
 
 BOOL APIENTRY
 DllMain(
-    HINSTANCE hInst /* Library instance handle. */ ,
-    DWORD reason /* Reason this function is being called. */ ,
-    LPVOID reserved /* Not used. */)
+HINSTANCE hInst /* Library instance handle. */,
+DWORD reason /* Reason this function is being called. */,
+LPVOID reserved /* Not used. */)
 {
     switch (reason)
     {
@@ -52,8 +54,8 @@ DllMain(
         g_app_path = get_app_full_path();
         config_load();
 
-    // FIXME: Are we really sure we want to load the audio plugin here, and not on RomOpen?
-    // audiohandle = (HMODULE)get_handle(liste_plugins, config.audio_path);
+        // FIXME: Are we really sure we want to load the audio plugin here, and not on RomOpen?
+        // audiohandle = (HMODULE)get_handle(liste_plugins, config.audio_path);
         break;
 
     case DLL_PROCESS_DETACH:
@@ -101,8 +103,8 @@ void* plugin_load(const std::string& path)
     info.AI_DACRATE_REG = &fake_AI_DACRATE_REG;
     info.AI_BITRATE_REG = &fake_AI_BITRATE_REG;
     info.CheckInterrupts = rsp.CheckInterrupts;
-    auto initiateAudio = (BOOL (__cdecl *)(AUDIO_INFO))GetProcAddress(module, "InitiateAudio");
-    g_processAList = (void (__cdecl *)(void))GetProcAddress(module, "ProcessAList");
+    auto initiateAudio = (BOOL(__cdecl*)(AUDIO_INFO))GetProcAddress(module, "InitiateAudio");
+    g_processAList = (void(__cdecl*)(void))GetProcAddress(module, "ProcessAList");
     initiateAudio(info);
 
     return module;
@@ -243,7 +245,7 @@ void handle_unknown_task(const OSTask_t* task, const uint32_t sum)
 __declspec(dllexport) void DllAbout(void* hParent)
 {
     auto message =
-        "Made using Azimer's code by Hacktarux.\r\nMaintained by Aurumaker72\r\nhttps://github.com/Aurumaker72/hacktarux-azimer-rsp-hle";
+    "Made using Azimer's code by Hacktarux.\r\nMaintained by Aurumaker72\r\nhttps://github.com/Aurumaker72/hacktarux-azimer-rsp-hle";
     FrontendService::show_info(message, PLUGIN_NAME, hParent);
 }
 

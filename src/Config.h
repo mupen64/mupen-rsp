@@ -2,8 +2,7 @@
 
 #define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.3.0"
 
-struct t_config
-{
+struct t_config {
     size_t version = 1;
     /**
      * \brief Whether audio lists are processed externally
@@ -14,16 +13,16 @@ struct t_config
      */
     bool graphics_hle = true;
     /**
-      * \brief Whether audio lists are processed by the audio plugin specified in audioname
-      */
+     * \brief Whether audio lists are processed by the audio plugin specified in audioname
+     */
     bool audio_external = false;
     /**
-      * \brief Verify the cached ucode function on every audio ucode task. Enable this if you are debugging dynamic ucode changes.  
-      */
+     * \brief Verify the cached ucode function on every audio ucode task. Enable this if you are debugging dynamic ucode changes.
+     */
     bool ucode_cache_verify = false;
     /**
-      * \brief Path to the external audio plugin path for alist processing 
-      */
+     * \brief Path to the external audio plugin path for alist processing
+     */
     char audio_path[260] = {0};
 };
 

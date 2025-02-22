@@ -18,10 +18,10 @@ extern int16_t Vol_Left;
 extern int16_t Vol_Right;
 extern int16_t VolTrg_Left;
 extern int32_t VolRamp_Left;
-//extern uint16_t VolRate_Left;
+// extern uint16_t VolRate_Left;
 extern int16_t VolTrg_Right;
 extern int32_t VolRamp_Right;
-//extern uint16_t VolRate_Right;
+// extern uint16_t VolRate_Right;
 
 
 extern short hleMixerWorkArea[256];
@@ -31,20 +31,20 @@ extern uint8_t BufferSpace[0x10000];
 
 /*
 static void SETVOL3 () { // Swapped Rate_Left and Vol
-	uint8_t Flags = (uint8_t)(inst1 >> 0x10);
-	if (Flags & 0x4) { // 288
-		if (Flags & 0x2) { // 290
-			VolTrg_Left  = *(int16_t*)&inst1;
-			VolRamp_Left = *(int32_t*)&inst2;
-		} else {
-			VolTrg_Right  = *(int16_t*)&inst1;
-			VolRamp_Right = *(int32_t*)&inst2;
-		}
-	} else {
-		Vol_Left	= *(int16_t*)&inst1;
-		Env_Dry		= (int16_t)(*(int32_t*)&inst2 >> 0x10);
-		Env_Wet		= *(int16_t*)&inst2;
-	}
+    uint8_t Flags = (uint8_t)(inst1 >> 0x10);
+    if (Flags & 0x4) { // 288
+        if (Flags & 0x2) { // 290
+            VolTrg_Left  = *(int16_t*)&inst1;
+            VolRamp_Left = *(int32_t*)&inst2;
+        } else {
+            VolTrg_Right  = *(int16_t*)&inst1;
+            VolRamp_Right = *(int32_t*)&inst2;
+        }
+    } else {
+        Vol_Left	= *(int16_t*)&inst1;
+        Env_Dry		= (int16_t)(*(int32_t*)&inst2 >> 0x10);
+        Env_Wet		= *(int16_t*)&inst2;
+    }
 }
 */
 static void SETVOL3()
@@ -63,7 +63,7 @@ static void SETVOL3()
         else
         {
             VolTrg_Right = *(int16_t*)&inst1; // 0x46
-            //VolRamp_Right = (uint16_t)(inst2 >> 0x10) | (int32_t)(int16_t)(inst2 << 0x10);
+            // VolRamp_Right = (uint16_t)(inst2 >> 0x10) | (int32_t)(int16_t)(inst2 << 0x10);
             VolRamp_Right = *(int32_t*)&inst2; // 0x48/0x4A
         }
     }
@@ -133,16 +133,16 @@ static void ENVMIXER3()
         RVol = *(int32_t*)(hleMixerWorkArea + 18); // 18-19
         LSig = *(int16_t*)(hleMixerWorkArea + 20); // 20-21
         RSig = *(int16_t*)(hleMixerWorkArea + 22); // 22-23
-        //uint32_t test  = *(int32_t *)(hleMixerWorkArea + 24); // 22-23
-        //if (test != 0x13371337)
+        // uint32_t test  = *(int32_t *)(hleMixerWorkArea + 24); // 22-23
+        // if (test != 0x13371337)
         //	__asm int 3;
     }
 
 
-    //if(!(flags&A_AUX)) {
+    // if(!(flags&A_AUX)) {
     //	AuxIncRate=0;
     //	aux2=aux3=zero;
-    //}
+    // }
 
     for (int y = 0; y < (0x170 / 2); y++)
     {
@@ -204,11 +204,15 @@ static void ENVMIXER3()
 
         // ****************************************************************
 
-        if (o1 > 32767) o1 = 32767;
-        else if (o1 < -32768) o1 = -32768;
+        if (o1 > 32767)
+            o1 = 32767;
+        else if (o1 < -32768)
+            o1 = -32768;
 
-        if (a1 > 32767) a1 = 32767;
-        else if (a1 < -32768) a1 = -32768;
+        if (a1 > 32767)
+            a1 = 32767;
+        else if (a1 < -32768)
+            a1 = -32768;
 
         // ****************************************************************
 
@@ -216,7 +220,7 @@ static void ENVMIXER3()
         aux1[y ^ 1] = a1;
 
         // ****************************************************************
-        //if (!(flags&A_AUX)) {
+        // if (!(flags&A_AUX)) {
         a2 = aux2[y ^ 1];
         a3 = aux3[y ^ 1];
 
@@ -226,11 +230,15 @@ static void ENVMIXER3()
         a2 += ((i1 * AuxL) + 0x4000) >> 15;
         a3 += ((i1 * AuxR) + 0x4000) >> 15;
 
-        if (a2 > 32767) a2 = 32767;
-        else if (a2 < -32768) a2 = -32768;
+        if (a2 > 32767)
+            a2 = 32767;
+        else if (a2 < -32768)
+            a2 = -32768;
 
-        if (a3 > 32767) a3 = 32767;
-        else if (a3 < -32768) a3 = -32768;
+        if (a3 > 32767)
+            a3 = 32767;
+        else if (a3 < -32768)
+            a3 = -32768;
 
         aux2[y ^ 1] = a2;
         aux3[y ^ 1] = a3;
@@ -258,14 +266,14 @@ static void ENVMIXER3o()
 {
     uint8_t flags = (uint8_t)((inst1 >> 16) & 0xff);
     uint32_t addy = (inst2 & 0xFFFFFF); // + SEGMENTS[(inst2>>24)&0xf];
-    //static FILE *dfile = fopen ("d:\\envmix.txt", "wt");
-    // ********* Make sure these conditions are met... ***********
+    // static FILE *dfile = fopen ("d:\\envmix.txt", "wt");
+    //  ********* Make sure these conditions are met... ***********
     if ((AudioInBuffer | AudioOutBuffer | AudioAuxA | AudioAuxC | AudioAuxE | AudioCount) & 0x3)
     {
         MessageBox(
-            NULL,
-            "Unaligned EnvMixer... please report this to Azimer with the following information: RomTitle, Place in the rom it occurred, and any save state just before the error",
-            "AudioHLE Error", MB_OK);
+        NULL,
+        "Unaligned EnvMixer... please report this to Azimer with the following information: RomTitle, Place in the rom it occurred, and any save state just before the error",
+        "AudioHLE Error", MB_OK);
     }
     // ------------------------------------------------------------
     short* inp = (short*)(BufferSpace + 0x4F0);
@@ -287,7 +295,7 @@ static void ENVMIXER3o()
     int32_t LTrg, RTrg;
     int16_t Wet, Dry;
 
-    //fprintf (dfile, "\n----------------------------------------------------\n");
+    // fprintf (dfile, "\n----------------------------------------------------\n");
     Vol_Right = (*(int16_t*)&inst1);
     if (flags & A_INIT)
     {
@@ -297,10 +305,10 @@ static void ENVMIXER3o()
         RAcc = ((int32_t)(int16_t)Vol_Right << 16);
         Wet = Env_Wet;
         Dry = Env_Dry; // Save Wet/Dry values
-        //LTrg = (VolTrg_Left << 16); RTrg = (VolTrg_Right << 16); // Save Current Left/Right Targets
+        // LTrg = (VolTrg_Left << 16); RTrg = (VolTrg_Right << 16); // Save Current Left/Right Targets
         LTrg = VolTrg_Left * 0x10000;
         RTrg = VolTrg_Right * 0x10000;
-        //fprintf (dfile, "Vol_Left = %08X LVol = %08X\n", Vol_Left, LVol);
+        // fprintf (dfile, "Vol_Left = %08X LVol = %08X\n", Vol_Left, LVol);
     }
     else
     {
@@ -323,7 +331,7 @@ static void ENVMIXER3o()
         aux2 = aux3 = zero;
     }
 
-    //fprintf (dfile, "LTrg = %08X, LVol = %08X\n", LTrg, LVol);
+    // fprintf (dfile, "LTrg = %08X, LVol = %08X\n", LTrg, LVol);
 
     for (int x = 0; x < (0x170 / 2); x++)
     {
@@ -336,8 +344,8 @@ static void ENVMIXER3o()
             a3 = (int)aux3[x ^ 1];
         }
         // TODO: here...
-        //LAcc = (LTrg << 16);
-        //RAcc = (RTrg << 16);
+        // LAcc = (LTrg << 16);
+        // RAcc = (RTrg << 16);
 
         LAcc += LVol;
         RAcc += RVol;
@@ -378,7 +386,7 @@ static void ENVMIXER3o()
             }
         }
 
-        //fprintf (dfile, "%04X ", (LAcc>>16));
+        // fprintf (dfile, "%04X ", (LAcc>>16));
 
         MainL = ((Dry * (LAcc >> 16)) + 0x4000) >> 15;
         MainR = ((Dry * (RAcc >> 16)) + 0x4000) >> 15;
@@ -398,28 +406,36 @@ static void ENVMIXER3o()
         AuxR  = (Wet * RTrg + 0x8000)  >> 16;
         AuxL  = (Wet * LTrg + 0x8000)  >> 16;*/
 
-        o1 += (/*(o1*0x7fff)+*/(i1 * MainR) + 0x4000) >> 15;
+        o1 += (/*(o1*0x7fff)+*/ (i1 * MainR) + 0x4000) >> 15;
 
-        a1 += (/*(a1*0x7fff)+*/(i1 * MainL) + 0x4000) >> 15;
+        a1 += (/*(a1*0x7fff)+*/ (i1 * MainL) + 0x4000) >> 15;
 
-        if (o1 > 32767) o1 = 32767;
-        else if (o1 < -32768) o1 = -32768;
+        if (o1 > 32767)
+            o1 = 32767;
+        else if (o1 < -32768)
+            o1 = -32768;
 
-        if (a1 > 32767) a1 = 32767;
-        else if (a1 < -32768) a1 = -32768;
+        if (a1 > 32767)
+            a1 = 32767;
+        else if (a1 < -32768)
+            a1 = -32768;
 
         out[x ^ 1] = o1;
         aux1[x ^ 1] = a1;
         if (AuxIncRate)
         {
-            a2 += (/*(a2*0x7fff)+*/(i1 * AuxR) + 0x4000) >> 15;
-            a3 += (/*(a3*0x7fff)+*/(i1 * AuxL) + 0x4000) >> 15;
+            a2 += (/*(a2*0x7fff)+*/ (i1 * AuxR) + 0x4000) >> 15;
+            a3 += (/*(a3*0x7fff)+*/ (i1 * AuxL) + 0x4000) >> 15;
 
-            if (a2 > 32767) a2 = 32767;
-            else if (a2 < -32768) a2 = -32768;
+            if (a2 > 32767)
+                a2 = 32767;
+            else if (a2 < -32768)
+                a2 = -32768;
 
-            if (a3 > 32767) a3 = 32767;
-            else if (a3 < -32768) a3 = -32768;
+            if (a3 > 32767)
+                a3 = 32767;
+            else if (a3 < -32768)
+                a3 = -32768;
 
             aux2[x ^ 1] = a2;
             aux3[x ^ 1] = a3;
@@ -439,81 +455,81 @@ static void ENVMIXER3o()
 
 /*
 static void ENVMIXER3 () { // Borrowed from RCP...
-	uint8_t  flags = (uint8_t)((inst1 >> 16) & 0xff);
-	uint32_t addy = (inst2 & 0xffffff);// + SEGMENTS[(inst2>>24)&0xf];
+    uint8_t  flags = (uint8_t)((inst1 >> 16) & 0xff);
+    uint32_t addy = (inst2 & 0xffffff);// + SEGMENTS[(inst2>>24)&0xf];
 
- 	short *inp=(short *)(BufferSpace+0x4F0);
-	short *out=(short *)(BufferSpace+0x9D0);
-	short *aux1=(short *)(BufferSpace+0xB40);
-	short *aux2=(short *)(BufferSpace+0xCB0);
-	short *aux3=(short *)(BufferSpace+0xE20);
+    short *inp=(short *)(BufferSpace+0x4F0);
+    short *out=(short *)(BufferSpace+0x9D0);
+    short *aux1=(short *)(BufferSpace+0xB40);
+    short *aux2=(short *)(BufferSpace+0xCB0);
+    short *aux3=(short *)(BufferSpace+0xE20);
 
-	Vol_Right = (inst1 & 0xffff); // Needed for future references
+    Vol_Right = (inst1 & 0xffff); // Needed for future references
 
-	int i1,o1,a1,a2,a3;
-	int MainR;
-	int MainL;
-	int AuxR;
-	int AuxL;
+    int i1,o1,a1,a2,a3;
+    int MainR;
+    int MainL;
+    int AuxR;
+    int AuxL;
 
-	WORD AuxIncRate=1;
-	short zero[8];
-	memset(zero,0,16);
-	if(flags & A_INIT) {
-		MainR = (Env_Dry * VolTrg_Right + 0x10000) >> 15;
-		MainL = (Env_Dry * VolTrg_Left  + 0x10000) >> 15;
-		AuxR  = (Env_Wet * VolTrg_Right + 0x8000)  >> 16;
-		AuxL  = (Env_Wet * VolTrg_Left  + 0x8000)  >> 16;
-	} else {
-		memcpy((uint8_t *)hleMixerWorkArea, (rsp.RDRAM+addy), 80);
-		MainR=hleMixerWorkArea[0];
-		MainL=hleMixerWorkArea[2];
-		AuxR=hleMixerWorkArea[4];
-		AuxL=hleMixerWorkArea[6];
-	}
-	if(!(flags&A_AUX))
-	{
-		AuxIncRate=0;
-		aux2=aux3=zero;
-	}
-	for(int i=0;i<(0x170/2);i++)
-	{
-		i1=(int)*(inp++);
-		o1=(int)*out;
-		a1=(int)*aux1;
-		a2=(int)*aux2;
-		a3=(int)*aux3;
+    WORD AuxIncRate=1;
+    short zero[8];
+    memset(zero,0,16);
+    if(flags & A_INIT) {
+        MainR = (Env_Dry * VolTrg_Right + 0x10000) >> 15;
+        MainL = (Env_Dry * VolTrg_Left  + 0x10000) >> 15;
+        AuxR  = (Env_Wet * VolTrg_Right + 0x8000)  >> 16;
+        AuxL  = (Env_Wet * VolTrg_Left  + 0x8000)  >> 16;
+    } else {
+        memcpy((uint8_t *)hleMixerWorkArea, (rsp.RDRAM+addy), 80);
+        MainR=hleMixerWorkArea[0];
+        MainL=hleMixerWorkArea[2];
+        AuxR=hleMixerWorkArea[4];
+        AuxL=hleMixerWorkArea[6];
+    }
+    if(!(flags&A_AUX))
+    {
+        AuxIncRate=0;
+        aux2=aux3=zero;
+    }
+    for(int i=0;i<(0x170/2);i++)
+    {
+        i1=(int)*(inp++);
+        o1=(int)*out;
+        a1=(int)*aux1;
+        a2=(int)*aux2;
+        a3=(int)*aux3;
 
-		o1=((o1*0x7fff)+(i1*MainR)+0x10000)>>15;
-		a2=((a2*0x7fff)+(i1*AuxR)+0x8000)>>16;
+        o1=((o1*0x7fff)+(i1*MainR)+0x10000)>>15;
+        a2=((a2*0x7fff)+(i1*AuxR)+0x8000)>>16;
 
-		a1=((a1*0x7fff)+(i1*MainL)+0x10000)>>15;
-		a3=((a3*0x7fff)+(i1*AuxL)+0x8000)>>16;
+        a1=((a1*0x7fff)+(i1*MainL)+0x10000)>>15;
+        a3=((a3*0x7fff)+(i1*AuxL)+0x8000)>>16;
 
-		if(o1>32767) o1=32767;
-		else if(o1<-32768) o1=-32768;
+        if(o1>32767) o1=32767;
+        else if(o1<-32768) o1=-32768;
 
-		if(a1>32767) a1=32767;
-		else if(a1<-32768) a1=-32768;
+        if(a1>32767) a1=32767;
+        else if(a1<-32768) a1=-32768;
 
-		if(a2>32767) a2=32767;
-		else if(a2<-32768) a2=-32768;
+        if(a2>32767) a2=32767;
+        else if(a2<-32768) a2=-32768;
 
-		if(a3>32767) a3=32767;
-		else if(a3<-32768) a3=-32768;
+        if(a3>32767) a3=32767;
+        else if(a3<-32768) a3=-32768;
 
-		*(out++)=o1;
-		*(aux1++)=a1;
-		*aux2=a2;
-		*aux3=a3;
-		aux2+=AuxIncRate;
-		aux3+=AuxIncRate;
-	}
-	hleMixerWorkArea[0]=MainR;
-	hleMixerWorkArea[2]=MainL;
-	hleMixerWorkArea[4]=AuxR;
-	hleMixerWorkArea[6]=AuxL;
-	memcpy(rsp.RDRAM+addy, (uint8_t *)hleMixerWorkArea,80);
+        *(out++)=o1;
+        *(aux1++)=a1;
+        *aux2=a2;
+        *aux3=a3;
+        aux2+=AuxIncRate;
+        aux3+=AuxIncRate;
+    }
+    hleMixerWorkArea[0]=MainR;
+    hleMixerWorkArea[2]=MainL;
+    hleMixerWorkArea[4]=AuxR;
+    hleMixerWorkArea[6]=AuxL;
+    memcpy(rsp.RDRAM+addy, (uint8_t *)hleMixerWorkArea,80);
 }*/
 
 
@@ -535,7 +551,7 @@ static void MIXER3()
 
     for (int x = 0; x < 0x170; x += 2)
     {
-        // I think I can do this a lot easier 
+        // I think I can do this a lot easier
         temp = (*(int16_t*)(BufferSpace + dmemin + x) * gain) >> 16;
         temp += *(int16_t*)(BufferSpace + dmemout + x);
 
@@ -571,8 +587,8 @@ static void LOADADPCM3()
     // Loads an ADPCM table - Works 100% Now 03-13-01
     uint32_t v0;
     v0 = (inst2 & 0xffffff);
-    //memcpy (dmem+0x3f0, rsp.RDRAM+v0, inst1&0xffff); 
-    //assert ((inst1&0xffff) <= 0x80);
+    // memcpy (dmem+0x3f0, rsp.RDRAM+v0, inst1&0xffff);
+    // assert ((inst1&0xffff) <= 0x80);
     uint16_t* table = (uint16_t*)(rsp.RDRAM + v0);
     for (uint32_t x = 0; x < ((inst1 & 0xffff) >> 0x4); x++)
     {
@@ -600,7 +616,7 @@ static void DMEMMOVE3()
     v1 = (inst2 >> 0x10) + 0x4f0;
     uint32_t count = ((inst2 + 3) & 0xfffc);
 
-    //memcpy (dmem+v1, dmem+v0, count-1);
+    // memcpy (dmem+v1, dmem+v0, count-1);
     for (cnt = 0; cnt < count; cnt++)
     {
         *(uint8_t*)(BufferSpace + ((cnt + v1) ^ 3)) = *(uint8_t*)(BufferSpace + ((cnt + v0) ^ 3));
@@ -616,10 +632,10 @@ static void ADPCM3()
 {
     // Verified to be 100% Accurate...
     BYTE Flags = (uint8_t)(inst2 >> 0x1c) & 0xff;
-    //WORD Gain=(uint16_t)(inst1&0xffff);
+    // WORD Gain=(uint16_t)(inst1&0xffff);
     DWORD Address = (inst1 & 0xffffff); // + SEGMENTS[(inst2>>24)&0xf];
     WORD inPtr = (inst2 >> 12) & 0xf;
-    //short *out=(int16_t *)(testbuff+(AudioOutBuffer>>2));
+    // short *out=(int16_t *)(testbuff+(AudioOutBuffer>>2));
     short* out = (short*)(BufferSpace + (inst2 & 0xfff) + 0x4f0);
     BYTE* in = (BYTE*)(BufferSpace + ((inst2 >> 12) & 0xf) + 0x4f0);
     short count = (short)((inst2 >> 16) & 0xfff);
@@ -677,7 +693,7 @@ static void ADPCM3()
         // so this appears to be a fractional scale based
         // on the 12 based inverse of the scale value.  note
         // that this could be negative, in which case we do
-        // not use the calculated vscale value... see the 
+        // not use the calculated vscale value... see the
         // if(code>12) check below
 
         inPtr++; // coded adpcm data lies next
@@ -786,12 +802,14 @@ static void ADPCM3()
         for (j = 0; j < 8; j++)
         {
             a[j ^ 1] >>= 11;
-            if (a[j ^ 1] > 32767) a[j ^ 1] = 32767;
-            else if (a[j ^ 1] < -32768) a[j ^ 1] = -32768;
+            if (a[j ^ 1] > 32767)
+                a[j ^ 1] = 32767;
+            else if (a[j ^ 1] < -32768)
+                a[j ^ 1] = -32768;
             *(out++) = a[j ^ 1];
             //*(out+j)=a[j^1];
         }
-        //out += 0x10;
+        // out += 0x10;
         l1 = a[6];
         l2 = a[7];
 
@@ -858,8 +876,10 @@ static void ADPCM3()
         for (j = 0; j < 8; j++)
         {
             a[j ^ 1] >>= 11;
-            if (a[j ^ 1] > 32767) a[j ^ 1] = 32767;
-            else if (a[j ^ 1] < -32768) a[j ^ 1] = -32768;
+            if (a[j ^ 1] > 32767)
+                a[j ^ 1] = 32767;
+            else if (a[j ^ 1] < -32768)
+                a[j ^ 1] = -32768;
             *(out++) = a[j ^ 1];
             //*(out+j+0x1f8)=a[j^1];
         }
@@ -889,7 +909,7 @@ static void RESAMPLE3()
     int32_t temp;
     int32_t accum;
 
-    //if (addy > (1024*1024*8))
+    // if (addy > (1024*1024*8))
     //	addy = (inst2 & 0xffffff);
 
     srcPtr -= 4;
@@ -905,7 +925,7 @@ static void RESAMPLE3()
 
     if ((Flags & 0x1) == 0)
     {
-        for (int x = 0; x < 4; x++) //memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
+        for (int x = 0; x < 4; x++) // memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
             src[(srcPtr + x) ^ 1] = ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1];
         Accum = *(uint16_t*)(rsp.RDRAM + addy + 10);
     }
@@ -915,25 +935,25 @@ static void RESAMPLE3()
             src[(srcPtr + x) ^ 1] = 0; //*(uint16_t *)(rsp.RDRAM+((addy+x)^2));
     }
 
-    //if ((Flags & 0x2))
+    // if ((Flags & 0x2))
     //	__asm int 3;
 
     for (int i = 0; i < 0x170 / 2; i++)
     {
         location = (((Accum * 0x40) >> 0x10) * 8);
-        //location = (Accum >> 0xa) << 0x3;
+        // location = (Accum >> 0xa) << 0x3;
         lut = (int16_t*)(((uint8_t*)ResampleLUT) + location);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 0) ^ 1)) * ((int32_t)((int16_t)lut[0])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 0) ^ 1)) * ((int32_t)((int16_t)lut[0])));
         accum = (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 1) ^ 1)) * ((int32_t)((int16_t)lut[1])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 1) ^ 1)) * ((int32_t)((int16_t)lut[1])));
         accum += (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 2) ^ 1)) * ((int32_t)((int16_t)lut[2])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 2) ^ 1)) * ((int32_t)((int16_t)lut[2])));
         accum += (int32_t)(temp >> 15);
 
-        temp = ((int32_t)*(int16_t*)(src + ((srcPtr + 3) ^ 1)) * ((int32_t)((int16_t)lut[3])));
+        temp = ((int32_t) * (int16_t*)(src + ((srcPtr + 3) ^ 1)) * ((int32_t)((int16_t)lut[3])));
         accum += (int32_t)(temp >> 15);
         /*		temp =  ((int64_t)*(int16_t*)(src+((srcPtr+0)^1))*((int64_t)((int16_t)lut[0]<<1)));
                 if (temp & 0x8000) temp = (temp^0x8000) + 0x10000;
@@ -942,7 +962,7 @@ static void RESAMPLE3()
                 if ((int32_t)temp > 32767) temp = 32767;
                 if ((int32_t)temp < -32768) temp = -32768;
                 accum = (int32_t)(int16_t)temp;
-        
+
                 temp = ((int64_t)*(int16_t*)(src+((srcPtr+1)^1))*((int64_t)((int16_t)lut[1]<<1)));
                 if (temp & 0x8000) temp = (temp^0x8000) + 0x10000;
                 else temp = (temp^0x8000);
@@ -950,7 +970,7 @@ static void RESAMPLE3()
                 if ((int32_t)temp > 32767) temp = 32767;
                 if ((int32_t)temp < -32768) temp = -32768;
                 accum += (int32_t)(int16_t)temp;
-        
+
                 temp = ((int64_t)*(int16_t*)(src+((srcPtr+2)^1))*((int64_t)((int16_t)lut[2]<<1)));
                 if (temp & 0x8000) temp = (temp^0x8000) + 0x10000;
                 else temp = (temp^0x8000);
@@ -958,7 +978,7 @@ static void RESAMPLE3()
                 if ((int32_t)temp > 32767) temp = 32767;
                 if ((int32_t)temp < -32768) temp = -32768;
                 accum += (int32_t)(int16_t)temp;
-        
+
                 temp = ((int64_t)*(int16_t*)(src+((srcPtr+3)^1))*((int64_t)((int16_t)lut[3]<<1)));
                 if (temp & 0x8000) temp = (temp^0x8000) + 0x10000;
                 else temp = (temp^0x8000);
@@ -967,8 +987,10 @@ static void RESAMPLE3()
                 if ((int32_t)temp < -32768) temp = -32768;
                 accum += (int32_t)(int16_t)temp;*/
 
-        if (accum > 32767) accum = 32767;
-        if (accum < -32768) accum = -32768;
+        if (accum > 32767)
+            accum = 32767;
+        if (accum < -32768)
+            accum = -32768;
 
         dst[dstPtr ^ 1] = (accum);
         dstPtr++;
@@ -984,14 +1006,14 @@ static void RESAMPLE3()
 static void INTERLEAVE3()
 {
     // Needs accuracy verification...
-    //uint32_t inL, inR;
+    // uint32_t inL, inR;
     uint16_t* outbuff = (uint16_t*)(BufferSpace + 0x4f0); //(uint16_t *)(AudioOutBuffer+dmem);
     uint16_t* inSrcR;
     uint16_t* inSrcL;
     uint16_t Left, Right;
 
-    //inR = inst2 & 0xFFFF;
-    //inL = (inst2 >> 16) & 0xFFFF;
+    // inR = inst2 & 0xFFFF;
+    // inL = (inst2 >> 16) & 0xFFFF;
 
     inSrcR = (uint16_t*)(BufferSpace + 0xb40);
     inSrcL = (uint16_t*)(BufferSpace + 0x9d0);
@@ -1017,26 +1039,26 @@ static void INTERLEAVE3()
     }
 }
 
-//static void UNKNOWN ();
+// static void UNKNOWN ();
 /*
 typedef struct {
-	BYTE sync;
+    BYTE sync;
 
-	BYTE error_protection	: 1;	//  0=yes, 1=no
-	BYTE lay				: 2;	// 4-lay = layerI, II or III
-	BYTE version			: 1;	// 3=mpeg 1.0, 2=mpeg 2.5 0=mpeg 2.0
-	BYTE sync2				: 4;
+    BYTE error_protection	: 1;	//  0=yes, 1=no
+    BYTE lay				: 2;	// 4-lay = layerI, II or III
+    BYTE version			: 1;	// 3=mpeg 1.0, 2=mpeg 2.5 0=mpeg 2.0
+    BYTE sync2				: 4;
 
-	BYTE extension			: 1;    // Unknown
-	BYTE padding			: 1;    // padding
-	BYTE sampling_freq		: 2;	// see table below
-	BYTE bitrate_index		: 4;	//     see table below
+    BYTE extension			: 1;    // Unknown
+    BYTE padding			: 1;    // padding
+    BYTE sampling_freq		: 2;	// see table below
+    BYTE bitrate_index		: 4;	//     see table below
 
-	BYTE emphasis			: 2;	//see table below
-	BYTE original			: 1;	// 0=no 1=yes
-	BYTE copyright			: 1;	// 0=no 1=yes
-	BYTE mode_ext			: 2;    // used with "joint stereo" mode
-	BYTE mode				: 2;    // Channel Mode
+    BYTE emphasis			: 2;	//see table below
+    BYTE original			: 1;	// 0=no 1=yes
+    BYTE copyright			: 1;	// 0=no 1=yes
+    BYTE mode_ext			: 2;    // used with "joint stereo" mode
+    BYTE mode				: 2;    // Channel Mode
 } mp3struct;
 
 mp3struct mp3;
@@ -1047,14 +1069,14 @@ static void WHATISTHIS()
 {
 }
 
-//static FILE *fp = fopen ("d:\\mp3info.txt", "wt");
+// static FILE *fp = fopen ("d:\\mp3info.txt", "wt");
 uint32_t setaddr;
 
 static void MP3ADDY()
 {
     setaddr = (inst2 & 0xffffff);
     //__asm int 3;
-    //fprintf (fp, "mp3addy: inst1: %08X, inst2: %08X, loopval: %08X\n", inst1, inst2, loopval);
+    // fprintf (fp, "mp3addy: inst1: %08X, inst2: %08X, loopval: %08X\n", inst1, inst2, loopval);
 }
 
 extern "C" {
@@ -1072,64 +1094,63 @@ void MP3();
 /*
  {
 //	return;
-	// Setup Registers...
-	mp3setup (inst1, inst2, 0xFA0);
-	
-	// Setup Memory Locations...
-	//uint32_t base = ((uint32_t*)dmem)[0xFD0/4]; // Should be 000291A0
-	memcpy (BufferSpace, dmembase+rsp.RDRAM, 0x10);
-	((uint32_t*)BufferSpace)[0x0] = base;
-	((uint32_t*)BufferSpace)[0x008/4] += base;
-	((uint32_t*)BufferSpace)[0xFFC/4] = loopval;
-	((uint32_t*)BufferSpace)[0xFF8/4] = dmembase;
-	//__asm int 3;
-	memcpy (imem+0x238, rsp.RDRAM+((uint32_t*)BufferSpace)[0x008/4], 0x9C0);
-	((uint32_t*)BufferSpace)[0xFF4/4] = setaddr;
-	pDMEM = (char *)BufferSpace;
-	rsp_run ();
-	dmembase = ((uint32_t*)BufferSpace)[0xFF8/4];
-	loopval  = ((uint32_t*)BufferSpace)[0xFFC/4];
+    // Setup Registers...
+    mp3setup (inst1, inst2, 0xFA0);
+
+    // Setup Memory Locations...
+    //uint32_t base = ((uint32_t*)dmem)[0xFD0/4]; // Should be 000291A0
+    memcpy (BufferSpace, dmembase+rsp.RDRAM, 0x10);
+    ((uint32_t*)BufferSpace)[0x0] = base;
+    ((uint32_t*)BufferSpace)[0x008/4] += base;
+    ((uint32_t*)BufferSpace)[0xFFC/4] = loopval;
+    ((uint32_t*)BufferSpace)[0xFF8/4] = dmembase;
+    //__asm int 3;
+    memcpy (imem+0x238, rsp.RDRAM+((uint32_t*)BufferSpace)[0x008/4], 0x9C0);
+    ((uint32_t*)BufferSpace)[0xFF4/4] = setaddr;
+    pDMEM = (char *)BufferSpace;
+    rsp_run ();
+    dmembase = ((uint32_t*)BufferSpace)[0xFF8/4];
+    loopval  = ((uint32_t*)BufferSpace)[0xFFC/4];
 //0x1A98  SW       S1, 0x0FF4 (R0)
 //0x1A9C  SW       S0, 0x0FF8 (R0)
 //0x1AA0  SW       T7, 0x0FFC (R0)
 //0x1AA4  SW       T3, 0x0FF0 (R0)
-	//fprintf (fp, "mp3: inst1: %08X, inst2: %08X\n", inst1, inst2);
+    //fprintf (fp, "mp3: inst1: %08X, inst2: %08X\n", inst1, inst2);
 }*/
 /*
 FFT = Fast Fourier Transform
 DCT = Discrete Cosine Transform
-MPEG-1 Layer 3 retains Layer 2�s 1152-sample window, as well as the FFT polyphase filter for 
-backward compatibility, but adds a modified DCT filter. DCT�s advantages over DFTs (discrete 
-Fourier transforms) include half as many multiply-accumulate operations and half the 
-generated coefficients because the sinusoidal portion of the calculation is absent, and DCT 
-generally involves simpler math. The finite lengths of a conventional DCTs� bandpass impulse 
-responses, however, may result in block-boundary effects. MDCTs overlap the analysis blocks 
-and lowpass-filter the decoded audio to remove aliases, eliminating these effects. MDCTs also 
-have a higher transform coding gain than the standard DCT, and their basic functions 
-correspond to better bandpass response. 
+MPEG-1 Layer 3 retains Layer 2�s 1152-sample window, as well as the FFT polyphase filter for
+backward compatibility, but adds a modified DCT filter. DCT�s advantages over DFTs (discrete
+Fourier transforms) include half as many multiply-accumulate operations and half the
+generated coefficients because the sinusoidal portion of the calculation is absent, and DCT
+generally involves simpler math. The finite lengths of a conventional DCTs� bandpass impulse
+responses, however, may result in block-boundary effects. MDCTs overlap the analysis blocks
+and lowpass-filter the decoded audio to remove aliases, eliminating these effects. MDCTs also
+have a higher transform coding gain than the standard DCT, and their basic functions
+correspond to better bandpass response.
 
-MPEG-1 Layer 3�s DCT sub-bands are unequally sized, and correspond to the human auditory 
-system�s critical bands. In Layer 3 decoders must support both constant- and variable-bit-rate 
-bit streams. (However, many Layer 1 and 2 decoders also handle variable bit rates). Finally, 
-Layer 3 encoders Huffman-code the quantized coefficients before archiving or transmission for 
-additional lossless compression. Bit streams range from 32 to 320 kbps, and 128-kbps rates 
-achieve near-CD quality, an important specification to enable dual-channel ISDN 
-(integrated-services-digital-network) to be the future high-bandwidth pipe to the home. 
+MPEG-1 Layer 3�s DCT sub-bands are unequally sized, and correspond to the human auditory
+system�s critical bands. In Layer 3 decoders must support both constant- and variable-bit-rate
+bit streams. (However, many Layer 1 and 2 decoders also handle variable bit rates). Finally,
+Layer 3 encoders Huffman-code the quantized coefficients before archiving or transmission for
+additional lossless compression. Bit streams range from 32 to 320 kbps, and 128-kbps rates
+achieve near-CD quality, an important specification to enable dual-channel ISDN
+(integrated-services-digital-network) to be the future high-bandwidth pipe to the home.
 
 */
 static void DISABLE()
 {
-    //MessageBox (NULL, "Help", "ABI 3 Command 0", MB_OK);
-    //ChangeABI (5);
+    // MessageBox (NULL, "Help", "ABI 3 Command 0", MB_OK);
+    // ChangeABI (5);
 }
 
 
 void (*ABI3[0x20])() = {
-    DISABLE, ADPCM3, CLEARBUFF3, ENVMIXER3, LOADBUFF3, RESAMPLE3, SAVEBUFF3, MP3,
-    MP3ADDY, SETVOL3, DMEMMOVE3, LOADADPCM3, MIXER3, INTERLEAVE3, WHATISTHIS, SETLOOP3,
-    SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP,
-    SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP
-};
+DISABLE, ADPCM3, CLEARBUFF3, ENVMIXER3, LOADBUFF3, RESAMPLE3, SAVEBUFF3, MP3,
+MP3ADDY, SETVOL3, DMEMMOVE3, LOADADPCM3, MIXER3, INTERLEAVE3, WHATISTHIS, SETLOOP3,
+SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP,
+SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP, SPNOOP};
 #if 0
 void (*ABI3[32])(void) =
 {

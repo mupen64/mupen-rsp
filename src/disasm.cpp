@@ -4,7 +4,7 @@
  *
  * Mupen64 homepage: http://mupen64.emulation64.com
  * email address: hacktarux@yahoo.fr
- * 
+ *
  * If you want to contribute to the project please contact
  * me first (maybe someone is already making what you are
  * planning to do).
@@ -25,7 +25,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
  * USA.
  *
-**/
+ **/
 
 #include "stdafx.h"
 
@@ -46,7 +46,8 @@ void disasm(FILE* f, unsigned long t[0x1000 / 4])
                 {
                     fprintf(f, "SLL r%d, r%d, %d\n", (t[i] >> 11) & 0x1F, (t[i] >> 16) & 0x1F, (t[i] >> 6) & 0x1F);
                 }
-                else fprintf(f, "NOP\n");
+                else
+                    fprintf(f, "NOP\n");
                 break;
             case 1:
                 fprintf(f, "invalid opcode\n");

@@ -7,8 +7,8 @@ http://www.egroups.com/group/Plugin64-Dev
 Notes:
 ------
 
-Setting the approprate bits in the MI_INTR_REG and calling CheckInterrupts which 
-are both passed to the DLL in InitiateAudio will generate an Interrupt from with in 
+Setting the approprate bits in the MI_INTR_REG and calling CheckInterrupts which
+are both passed to the DLL in InitiateAudio will generate an Interrupt from with in
 the plugin.
 
 **********************************************************************************/
@@ -24,8 +24,8 @@ extern "C" {
 
 /* Note: int32_t, uint8_t, WORD, uint32_t, TRUE, FALSE are defined in windows.h */
 
-#define EXPORT						__declspec(dllexport)
-#define CALL						_cdecl
+#define EXPORT __declspec(dllexport)
+#define CALL _cdecl
 
 /******************************************************************
   Function: AiDacrateChanged
@@ -61,10 +61,10 @@ EXPORT uint32_t CALL AiReadLength(void);
   Function: AiUpdate
   Purpose:  This function is called to allow the dll to update
             things on a regular basis (check how long to sound to
-			go, copy more stuff to the buffer, anyhting you like).
-			The function is designed to go in to the message loop
-			of the main window ... but can be placed anywhere you 
-			like.
+            go, copy more stuff to the buffer, anyhting you like).
+            The function is designed to go in to the message loop
+            of the main window ... but can be placed anywhere you
+            like.
   input:    if Wait is set to true, then this function should wait
             till there is a messgae in the its message queue.
   output:   none
@@ -120,13 +120,13 @@ EXPORT void CALL GetDllInfo(PLUGIN_INFO* PluginInfo);
 /******************************************************************
   Function: InitiateSound
   Purpose:  This function is called when the DLL is started to give
-            information from the emulator that the n64 audio 
-			interface needs
+            information from the emulator that the n64 audio
+            interface needs
   Input:    Audio_Info is passed to this function which is defined
             above.
   Output:   TRUE on success
             FALSE on failure to initialise
-             
+
   ** note on interrupts **:
   To generate an interrupt set the appropriate bit in MI_INTR_REG
   and then call the function CheckInterrupts to tell the emulator
@@ -138,7 +138,7 @@ EXPORT int32_t CALL InitiateAudio(AUDIO_INFO Audio_Info);
   Function: ProcessAList
   Purpose:  This function is called when there is a Alist to be
             processed. The Dll will have to work out all the info
-			about the AList itself.
+            about the AList itself.
   input:    none
   output:   none
 *******************************************************************/
