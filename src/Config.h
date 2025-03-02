@@ -33,6 +33,12 @@ struct t_config {
 };
 
 extern t_config config;
+extern core_plugin_cfg g_cfg;
+
+/**
+ * \brief Initializes g_cfg.
+ */
+void config_init();
 
 /**
  * \brief Saves the config

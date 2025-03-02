@@ -9,6 +9,9 @@
 #include "hle.h"
 #include "FrontendService.h"
 
+#define EXPORT __declspec(dllexport)
+#define CALL _cdecl
+
 core_rsp_info rsp;
 
 // Whether RSP has been called since last ROM close
@@ -16,9 +19,6 @@ bool g_rsp_alive = false;
 
 void* audio_plugin = nullptr;
 extern void (*g_processAList)();
-
-#define EXPORT __declspec(dllexport)
-#define CALL _cdecl
 
 #define UCODE_MARIO (1)
 #define UCODE_BANJO (2)
@@ -287,11 +287,22 @@ EXPORT void CALL InitiateRSP(core_rsp_info Rsp_Info, uint32_t* CycleCount)
     rsp = Rsp_Info;
 }
 
- EXPORT void CALL RomClosed(void)
+EXPORT void CALL RomClosed(void)
 {
     memset(rsp.dmem, 0, 0x1000);
     memset(rsp.imem, 0, 0x1000);
 
     g_audio_ucode_func = nullptr;
     g_rsp_alive = false;
+}
+
+EXPORT void CALL GetConfig1(core_plugin_cfg** cfg)
+{
+    *cfg = &g_cfg;
+}
+
+EXPORT bool CALL SaveConfig1()
+{
+    config_save();
+    return true;
 }

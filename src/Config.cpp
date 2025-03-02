@@ -11,7 +11,28 @@
 #define CONFIG_PATH "hacktarux-azimer-rsp-hle.cfg"
 
 t_config config = {};
-constexpr t_config default_config = {};
+core_plugin_cfg g_cfg{};
+t_config default_config = {};
+
+const wchar_t* cfg_groups[] = {L"General"};
+
+core_plugin_cfg_item cfg_items[] = {
+{0, pcit_bool, L"Audio HLE", L"Whether audio lists are processed externally", 0, nullptr, &config.audio_hle, &default_config.audio_hle},
+{0, pcit_bool, L"Graphics HLE", L"Whether display lists are processed externally", 0, nullptr, &config.graphics_hle, &default_config.graphics_hle},
+{0, pcit_bool, L"Audio External", L"Whether audio lists are processed by the audio plugin specified by 'Audio Path'", 0, nullptr, &config.audio_external, &default_config.audio_external},
+{0, pcit_path, L"Audio Path", L"Path to the external audio plugin path for alist processing", 0, nullptr, config.audio_path, default_config.audio_path},
+{0, pcit_bool, L"Ucode Cache Verify", L"Verify the cached ucode function on every audio ucode task. Enable this if you are debugging dynamic ucode changes.", 0, nullptr, &config.ucode_cache_verify, &default_config.ucode_cache_verify},
+};
+
+void config_init()
+{
+    g_cfg = {
+        .groups_len = std::size(cfg_groups),
+        .groups = cfg_groups,
+        .items_len = std::size(cfg_items),
+        .items = cfg_items,
+    };    
+}
 
 void config_save()
 {

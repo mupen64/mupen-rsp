@@ -45,7 +45,6 @@ char* getExtension(char* str)
         return NULL;
 }
 
-
 BOOL APIENTRY DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
 {
     switch (reason)
@@ -54,6 +53,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
         g_instance = hinst;
         g_app_path = get_app_full_path();
         config_load();
+        config_init();
         break;
     default:
         break;
