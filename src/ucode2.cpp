@@ -34,7 +34,7 @@ static void LOADADPCM2()
     // Loads an ADPCM table - Works 100% Now 03-13-01
     uint32_t v0;
     v0 = (inst2 & 0xffffff); // + SEGMENTS[(inst2>>24)&0xf];
-    uint16_t* table = (uint16_t*)(rsp.RDRAM + v0); // Zelda2 Specific...
+    uint16_t* table = (uint16_t*)(rsp.rdram + v0); // Zelda2 Specific...
 
     for (uint32_t x = 0; x < ((inst1 & 0xffff) >> 0x4); x++)
     {
@@ -117,18 +117,18 @@ static void ADPCM2()
             /*
                         for(int i=0;i<16;i++)
                         {
-                            out[i]=*(short *)&rsp.RDRAM[(loopval+i*2)^2];
+                            out[i]=*(short *)&rsp.rdram[(loopval+i*2)^2];
                         }*/
-            memcpy(out, &rsp.RDRAM[loopval], 32);
+            memcpy(out, &rsp.rdram[loopval], 32);
         }
         else
         {
             /*
                         for(int i=0;i<16;i++)
                         {
-                            out[i]=*(short *)&rsp.RDRAM[(Address+i*2)^2];
+                            out[i]=*(short *)&rsp.rdram[(Address+i*2)^2];
                         }*/
-            memcpy(out, &rsp.RDRAM[Address], 32);
+            memcpy(out, &rsp.rdram[Address], 32);
         }
     }
 
@@ -373,7 +373,7 @@ static void ADPCM2()
         count -= 32;
     }
     out -= 16;
-    memcpy(&rsp.RDRAM[Address], out, 32);
+    memcpy(&rsp.rdram[Address], out, 32);
 }
 
 static void CLEARBUFF2()
@@ -390,7 +390,7 @@ static void LOADBUFF2()
     uint32_t v0;
     uint32_t cnt = (((inst1 >> 0xC) + 3) & 0xFFC);
     v0 = (inst2 & 0xfffffc); // + SEGMENTS[(inst2>>24)&0xf];
-    memcpy(BufferSpace + (inst1 & 0xfffc), rsp.RDRAM + v0, (cnt + 3) & 0xFFFC);
+    memcpy(BufferSpace + (inst1 & 0xfffc), rsp.rdram + v0, (cnt + 3) & 0xFFFC);
 }
 
 static void SAVEBUFF2()
@@ -399,7 +399,7 @@ static void SAVEBUFF2()
     uint32_t v0;
     uint32_t cnt = (((inst1 >> 0xC) + 3) & 0xFFC);
     v0 = (inst2 & 0xfffffc); // + SEGMENTS[(inst2>>24)&0xf];
-    memcpy(rsp.RDRAM + v0, BufferSpace + (inst1 & 0xfffc), (cnt + 3) & 0xFFFC);
+    memcpy(rsp.rdram + v0, BufferSpace + (inst1 & 0xfffc), (cnt + 3) & 0xFFFC);
 }
 
 
@@ -453,14 +453,14 @@ static void RESAMPLE2()
 
     if ((Flags & 0x1) == 0)
     {
-        for (int x = 0; x < 4; x++) // memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
-            src[(srcPtr + x) ^ 1] = ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1];
-        Accum = *(uint16_t*)(rsp.RDRAM + addy + 10);
+        for (int x = 0; x < 4; x++) // memcpy (src+srcPtr, rsp.rdram+addy, 0x8);
+            src[(srcPtr + x) ^ 1] = ((uint16_t*)rsp.rdram)[((addy / 2) + x) ^ 1];
+        Accum = *(uint16_t*)(rsp.rdram + addy + 10);
     }
     else
     {
         for (int x = 0; x < 4; x++)
-            src[(srcPtr + x) ^ 1] = 0; //*(uint16_t *)(rsp.RDRAM+((addy+x)^2));
+            src[(srcPtr + x) ^ 1] = 0; //*(uint16_t *)(rsp.rdram+((addy+x)^2));
     }
 
     //	if ((Flags & 0x2))
@@ -496,8 +496,8 @@ static void RESAMPLE2()
         Accum &= 0xffff;
     }
     for (int x = 0; x < 4; x++)
-        ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1] = src[(srcPtr + x) ^ 1];
-    *(uint16_t*)(rsp.RDRAM + addy + 10) = (uint16_t)Accum;
+        ((uint16_t*)rsp.rdram)[((addy / 2) + x) ^ 1] = src[(srcPtr + x) ^ 1];
+    *(uint16_t*)(rsp.rdram + addy + 10) = (uint16_t)Accum;
     // memcpy (RSWORK, src+srcPtr, 0x8);
 }
 
@@ -878,7 +878,7 @@ static void FILTER2()
     static int cnt = 0;
     static int16_t* lutt6;
     static int16_t* lutt5;
-    uint8_t* save = (rsp.RDRAM + (inst2 & 0xFFFFFF));
+    uint8_t* save = (rsp.rdram + (inst2 & 0xFFFFFF));
     uint8_t t4 = (uint8_t)((inst1 >> 0x10) & 0xFF);
     int x;
 
@@ -887,13 +887,13 @@ static void FILTER2()
         // Then set the cnt variable
         cnt = (inst1 & 0xFFFF);
         lutt6 = (int16_t*)save;
-        //				memcpy (dmem+0xFE0, rsp.RDRAM+(inst2&0xFFFFFF), 0x10);
+        //				memcpy (dmem+0xFE0, rsp.rdram+(inst2&0xFFFFFF), 0x10);
         return;
     }
 
     if (t4 == 0)
     {
-        //				memcpy (dmem+0xFB0, rsp.RDRAM+(inst2&0xFFFFFF), 0x20);
+        //				memcpy (dmem+0xFB0, rsp.rdram+(inst2&0xFFFFFF), 0x20);
         lutt5 = (short*)(save + 0x10);
     }
 
@@ -999,7 +999,7 @@ static void FILTER2()
         inp2 += 8;
         outp += 8;
     }
-    //			memcpy (rsp.RDRAM+(inst2&0xFFFFFF), dmem+0xFB0, 0x20);
+    //			memcpy (rsp.rdram+(inst2&0xFFFFFF), dmem+0xFB0, 0x20);
     memcpy(save, inp2 - 8, 0x10);
     memcpy(BufferSpace + (inst1 & 0xffff), outbuff, cnt);
 }

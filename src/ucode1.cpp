@@ -193,7 +193,7 @@ static void ENVMIXER()
     {
         // Load LVol, RVol, LAcc, and RAcc (all 32bit)
         // Load Wet, Dry, LTrg, RTrg
-        memcpy((uint8_t*)hleMixerWorkArea, (rsp.RDRAM + addy), 80);
+        memcpy((uint8_t*)hleMixerWorkArea, (rsp.rdram + addy), 80);
         Wet = *(int16_t*)(hleMixerWorkArea + 0); // 0-1
         Dry = *(int16_t*)(hleMixerWorkArea + 2); // 2-3
         LTrg = *(int32_t*)(hleMixerWorkArea + 4); // 4-5
@@ -435,7 +435,7 @@ static void ENVMIXER()
     *(int32_t*)(hleMixerWorkArea + 14) = RAdderEnd; // 14-15
     *(int32_t*)(hleMixerWorkArea + 16) = LAdderStart; // 12-13
     *(int32_t*)(hleMixerWorkArea + 18) = RAdderStart; // 14-15
-    memcpy(rsp.RDRAM + addy, (uint8_t*)hleMixerWorkArea, 80);
+    memcpy(rsp.rdram + addy, (uint8_t*)hleMixerWorkArea, 80);
 }
 
 static void ENVMIXERo()
@@ -468,7 +468,7 @@ static void ENVMIXERo()
     }
     else
     {
-        memcpy((uint8_t*)hleMixerWorkArea, (rsp.RDRAM + addy), 80);
+        memcpy((uint8_t*)hleMixerWorkArea, (rsp.rdram + addy), 80);
         MainR = hleMixerWorkArea[0];
         MainL = hleMixerWorkArea[2];
         AuxR = hleMixerWorkArea[4];
@@ -524,7 +524,7 @@ static void ENVMIXERo()
     hleMixerWorkArea[2] = MainL;
     hleMixerWorkArea[4] = AuxR;
     hleMixerWorkArea[6] = AuxL;
-    memcpy(rsp.RDRAM + addy, (uint8_t*)hleMixerWorkArea, 80);
+    memcpy(rsp.rdram + addy, (uint8_t*)hleMixerWorkArea, 80);
 }
 
 static void RESAMPLE()
@@ -551,15 +551,15 @@ static void RESAMPLE()
 
     if ((Flags & 0x1) == 0)
     {
-        // memcpy (src+srcPtr, rsp.RDRAM+addy, 0x8);
+        // memcpy (src+srcPtr, rsp.rdram+addy, 0x8);
         for (int x = 0; x < 4; x++)
-            src[(srcPtr + x) ^ 1] = ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1];
-        Accum = *(uint16_t*)(rsp.RDRAM + addy + 10);
+            src[(srcPtr + x) ^ 1] = ((uint16_t*)rsp.rdram)[((addy / 2) + x) ^ 1];
+        Accum = *(uint16_t*)(rsp.rdram + addy + 10);
     }
     else
     {
         for (int x = 0; x < 4; x++)
-            src[(srcPtr + x) ^ 1] = 0; //*(uint16_t *)(rsp.RDRAM+((addy+x)^2));
+            src[(srcPtr + x) ^ 1] = 0; //*(uint16_t *)(rsp.rdram+((addy+x)^2));
     }
 
     if ((Flags & 0x2))
@@ -611,9 +611,9 @@ static void RESAMPLE()
         Accum &= 0xffff;
     }
     for (int x = 0; x < 4; x++)
-        ((uint16_t*)rsp.RDRAM)[((addy / 2) + x) ^ 1] = src[(srcPtr + x) ^ 1];
+        ((uint16_t*)rsp.rdram)[((addy / 2) + x) ^ 1] = src[(srcPtr + x) ^ 1];
     // memcpy (RSWORK, src+srcPtr, 0x8);
-    *(uint16_t*)(rsp.RDRAM + addy + 10) = Accum;
+    *(uint16_t*)(rsp.rdram + addy + 10) = Accum;
 }
 
 static void SETVOL()
@@ -725,11 +725,11 @@ static void ADPCM()
     {
         if (Flags & 0x2)
         {
-            memcpy(out, &rsp.RDRAM[loopval & 0x7fffff], 32);
+            memcpy(out, &rsp.rdram[loopval & 0x7fffff], 32);
         }
         else
         {
-            memcpy(out, &rsp.RDRAM[Address], 32);
+            memcpy(out, &rsp.rdram[Address], 32);
         }
     }
 
@@ -948,7 +948,7 @@ static void ADPCM()
         count -= 32;
     }
     out -= 16;
-    memcpy(&rsp.RDRAM[Address], out, 32);
+    memcpy(&rsp.rdram[Address], out, 32);
 }
 
 static void LOADBUFF()
@@ -959,7 +959,7 @@ static void LOADBUFF()
     if (AudioCount == 0)
         return;
     v0 = (inst2 & 0xfffffc); // + SEGMENTS[(inst2>>24)&0xf];
-    memcpy(BufferSpace + (AudioInBuffer & 0xFFFC), rsp.RDRAM + v0, (AudioCount + 3) & 0xFFFC);
+    memcpy(BufferSpace + (AudioInBuffer & 0xFFFC), rsp.rdram + v0, (AudioCount + 3) & 0xFFFC);
 }
 
 static void SAVEBUFF()
@@ -970,7 +970,7 @@ static void SAVEBUFF()
     if (AudioCount == 0)
         return;
     v0 = (inst2 & 0xfffffc); // + SEGMENTS[(inst2>>24)&0xf];
-    memcpy(rsp.RDRAM + v0, BufferSpace + (AudioOutBuffer & 0xFFFC), (AudioCount + 3) & 0xFFFC);
+    memcpy(rsp.rdram + v0, BufferSpace + (AudioOutBuffer & 0xFFFC), (AudioCount + 3) & 0xFFFC);
 }
 
 static void SEGMENT()
@@ -1030,9 +1030,9 @@ static void LOADADPCM()
     v0 = (inst2 & 0xffffff); // + SEGMENTS[(inst2>>24)&0xf];
     /*	if (v0 > (1024*1024*8))
             v0 = (inst2 & 0xffffff);*/
-    // memcpy (dmem+0x4c0, rsp.RDRAM+v0, inst1&0xffff); // Could prolly get away with not putting this in dmem
+    // memcpy (dmem+0x4c0, rsp.rdram+v0, inst1&0xffff); // Could prolly get away with not putting this in dmem
     // assert ((inst1&0xffff) <= 0x80);
-    uint16_t* table = (uint16_t*)(rsp.RDRAM + v0);
+    uint16_t* table = (uint16_t*)(rsp.rdram + v0);
     for (uint32_t x = 0; x < ((inst1 & 0xffff) >> 0x4); x++)
     {
         adpcmtable[0x1 + (x << 3)] = table[0];

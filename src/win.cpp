@@ -7,12 +7,12 @@
 #include "stdafx.h"
 #include "Config.h"
 #include "FrontendService.h"
-#include "RSP.h"
+#include "core_plugin.h"
 #include "disasm.h"
 #include "hle.h"
 #include "win.h"
 
-extern RSP_INFO rsp;
+extern core_rsp_info rsp;
 extern bool g_rsp_alive;
 
 HINSTANCE g_instance;
@@ -80,24 +80,24 @@ void* plugin_load(const std::string& path)
         return nullptr;
     }
 
-    AUDIO_INFO info;
+    core_audio_info info;
     // FIXME: Do we have to provide hwnd?
-    info.hwnd = NULL;
-    info.hinst = (HINSTANCE)rsp.hInst;
-    info.MemoryBswaped = TRUE;
-    info.HEADER = fake_header;
-    info.RDRAM = rsp.RDRAM;
-    info.DMEM = rsp.DMEM;
-    info.IMEM = rsp.IMEM;
-    info.MI_INTR_REG = rsp.MI_INTR_REG;
-    info.AI_DRAM_ADDR_REG = &fake_AI_DRAM_ADDR_REG;
-    info.AI_LEN_REG = &fake_AI_LEN_REG;
-    info.AI_CONTROL_REG = &fake_AI_CONTROL_REG;
-    info.AI_STATUS_REG = &fake_AI_STATUS_REG;
-    info.AI_DACRATE_REG = &fake_AI_DACRATE_REG;
-    info.AI_BITRATE_REG = &fake_AI_BITRATE_REG;
-    info.CheckInterrupts = rsp.CheckInterrupts;
-    auto initiateAudio = (BOOL(__cdecl*)(AUDIO_INFO))GetProcAddress(module, "InitiateAudio");
+    info.main_hwnd = NULL;
+    info.hinst = (HINSTANCE)rsp.hinst;
+    info.byteswapped = TRUE;
+    info.rom = fake_header;
+    info.rdram = rsp.rdram;
+    info.dmem = rsp.dmem;
+    info.imem = rsp.imem;
+    info.mi_intr_reg = rsp.mi_intr_reg;
+    info.ai_dram_addr_reg = &fake_AI_DRAM_ADDR_REG;
+    info.ai_len_reg = &fake_AI_LEN_REG;
+    info.ai_control_reg = &fake_AI_CONTROL_REG;
+    info.ai_status_reg = &fake_AI_STATUS_REG;
+    info.ai_dacrate_reg = &fake_AI_DACRATE_REG;
+    info.ai_bitrate_reg = &fake_AI_BITRATE_REG;
+    info.check_interrupts = rsp.check_interrupts;
+    auto initiateAudio = (BOOL(__cdecl*)(core_audio_info))GetProcAddress(module, "InitiateAudio");
     g_processAList = (void(__cdecl*)(void))GetProcAddress(module, "ProcessAList");
     initiateAudio(info);
 
@@ -201,37 +201,37 @@ void handle_unknown_task(const OSTask_t* task, const uint32_t sum)
 {
     char s[1024];
     FILE* f;
-    sprintf(s, "unknown task:\n\ttype:%d\n\tsum:%x\n\tPC:%x", task->type, sum, rsp.SP_PC_REG);
+    sprintf(s, "unknown task:\n\ttype:%d\n\tsum:%x\n\tPC:%x", task->type, sum, rsp.sp_pc_reg);
     MessageBox(NULL, s, "unknown task", MB_OK);
 
     if (task->ucode_size <= 0x1000)
     {
         f = fopen("imem.dat", "wb");
-        fwrite(rsp.RDRAM + task->ucode, task->ucode_size, 1, f);
+        fwrite(rsp.rdram + task->ucode, task->ucode_size, 1, f);
         fclose(f);
 
         f = fopen("dmem.dat", "wb");
-        fwrite(rsp.RDRAM + task->ucode_data, task->ucode_data_size, 1, f);
+        fwrite(rsp.rdram + task->ucode_data, task->ucode_data_size, 1, f);
         fclose(f);
 
         f = fopen("disasm.txt", "wb");
-        memcpy(rsp.DMEM, rsp.RDRAM + task->ucode_data, task->ucode_data_size);
-        memcpy(rsp.IMEM + 0x80, rsp.RDRAM + task->ucode, 0xF7F);
-        disasm(f, (unsigned long*)(rsp.IMEM));
+        memcpy(rsp.dmem, rsp.rdram + task->ucode_data, task->ucode_data_size);
+        memcpy(rsp.imem + 0x80, rsp.rdram + task->ucode, 0xF7F);
+        disasm(f, (unsigned long*)(rsp.imem));
         fclose(f);
     }
     else
     {
         f = fopen("imem.dat", "wb");
-        fwrite(rsp.IMEM, 0x1000, 1, f);
+        fwrite(rsp.imem, 0x1000, 1, f);
         fclose(f);
 
         f = fopen("dmem.dat", "wb");
-        fwrite(rsp.DMEM, 0x1000, 1, f);
+        fwrite(rsp.dmem, 0x1000, 1, f);
         fclose(f);
 
         f = fopen("disasm.txt", "wb");
-        disasm(f, (unsigned long*)(rsp.IMEM));
+        disasm(f, (unsigned long*)(rsp.imem));
         fclose(f);
     }
 }

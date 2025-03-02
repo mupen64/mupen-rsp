@@ -6,17 +6,19 @@
 
 #include "stdafx.h"
 #include "Config.h"
-#include "RSP.h"
 #include "hle.h"
 #include "FrontendService.h"
 
-RSP_INFO rsp;
+core_rsp_info rsp;
 
 // Whether RSP has been called since last ROM close
 bool g_rsp_alive = false;
 
 void* audio_plugin = nullptr;
 extern void (*g_processAList)();
+
+#define EXPORT __declspec(dllexport)
+#define CALL _cdecl
 
 #define UCODE_MARIO (1)
 #define UCODE_BANJO (2)
@@ -62,14 +64,14 @@ void audio_ucode_zelda()
 
 int audio_ucode_detect_type(const OSTask_t* task)
 {
-    if (*(unsigned long*)(rsp.RDRAM + task->ucode_data + 0) != 0x1)
+    if (*(unsigned long*)(rsp.rdram + task->ucode_data + 0) != 0x1)
     {
-        if (*(rsp.RDRAM + task->ucode_data + (0 ^ (3 - S8))) == 0xF)
+        if (*(rsp.rdram + task->ucode_data + (0 ^ (3 - S8))) == 0xF)
             return 4;
         return 3;
     }
 
-    if (*(unsigned long*)(rsp.RDRAM + task->ucode_data + 0x30) == 0xF0000F00)
+    if (*(unsigned long*)(rsp.rdram + task->ucode_data + 0x30) == 0xF0000F00)
         return 1;
     return 2;
 }
@@ -127,7 +129,7 @@ int audio_ucode(OSTask_t* task)
 
     g_audio_ucode_func();
 
-    const auto p_alist = (unsigned long*)(rsp.RDRAM + task->data_ptr);
+    const auto p_alist = (unsigned long*)(rsp.rdram + task->data_ptr);
 
     for (unsigned int i = 0; i < (task->data_size / 4); i += 2)
     {
@@ -139,9 +141,9 @@ int audio_ucode(OSTask_t* task)
     return 0;
 }
 
-__declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
+EXPORT uint32_t CALL DoRspCycles(uint32_t Cycles)
 {
-    OSTask_t* task = (OSTask_t*)(rsp.DMEM + 0xFC0);
+    OSTask_t* task = (OSTask_t*)(rsp.dmem + 0xFC0);
     unsigned int i, sum = 0;
 
     g_rsp_alive = true;
@@ -156,54 +158,54 @@ __declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
 
     if (task->type == 1 && task->data_ptr != 0 && config.graphics_hle)
     {
-        if (rsp.ProcessDlistList != NULL)
+        if (rsp.process_dlist_list != NULL)
         {
-            rsp.ProcessDlistList();
+            rsp.process_dlist_list();
         }
-        *rsp.SP_STATUS_REG |= 0x0203;
-        if ((*rsp.SP_STATUS_REG & 0x40) != 0)
+        *rsp.sp_status_reg |= 0x0203;
+        if ((*rsp.sp_status_reg & 0x40) != 0)
         {
-            *rsp.MI_INTR_REG |= 0x1;
-            rsp.CheckInterrupts();
+            *rsp.mi_intr_reg |= 0x1;
+            rsp.check_interrupts();
         }
 
-        *rsp.DPC_STATUS_REG &= ~0x0002;
+        *rsp.dpc_status_reg &= ~0x0002;
         return Cycles;
     }
     else if (task->type == 2 && config.audio_hle)
     {
         if (config.audio_external)
             g_processAList();
-        else if (rsp.ProcessAlistList != NULL)
+        else if (rsp.process_alist_list != NULL)
         {
-            rsp.ProcessAlistList();
+            rsp.process_alist_list();
         }
-        *rsp.SP_STATUS_REG |= 0x0203;
-        if ((*rsp.SP_STATUS_REG & 0x40) != 0)
+        *rsp.sp_status_reg |= 0x0203;
+        if ((*rsp.sp_status_reg & 0x40) != 0)
         {
-            *rsp.MI_INTR_REG |= 0x1;
-            rsp.CheckInterrupts();
+            *rsp.mi_intr_reg |= 0x1;
+            rsp.check_interrupts();
         }
         return Cycles;
     }
     else if (task->type == 7)
     {
-        rsp.ShowCFB();
+        rsp.show_cfb();
     }
 
-    *rsp.SP_STATUS_REG |= 0x203;
-    if ((*rsp.SP_STATUS_REG & 0x40) != 0)
+    *rsp.sp_status_reg |= 0x203;
+    if ((*rsp.sp_status_reg & 0x40) != 0)
     {
-        *rsp.MI_INTR_REG |= 0x1;
-        rsp.CheckInterrupts();
+        *rsp.mi_intr_reg |= 0x1;
+        rsp.check_interrupts();
     }
 
     if (task->ucode_size <= 0x1000)
         for (i = 0; i < (task->ucode_size / 2); i++)
-            sum += *(rsp.RDRAM + task->ucode + i);
+            sum += *(rsp.rdram + task->ucode + i);
     else
         for (i = 0; i < (0x1000 / 2); i++)
-            sum += *(rsp.IMEM + i);
+            sum += *(rsp.imem + i);
 
 
     if (task->ucode_size > 0x1000)
@@ -213,20 +215,20 @@ __declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
         case 0x9E2: // banjo tooie (U) boot code
             {
                 int i, j;
-                memcpy(rsp.IMEM + 0x120, rsp.RDRAM + 0x1e8, 0x1e8);
+                memcpy(rsp.imem + 0x120, rsp.rdram + 0x1e8, 0x1e8);
                 for (j = 0; j < 0xfc; j++)
                     for (i = 0; i < 8; i++)
-                        *(rsp.RDRAM + ((0x2fb1f0 + j * 0xff0 + i) ^ S8)) = *(rsp.IMEM + ((0x120 + j * 8 + i) ^ S8));
+                        *(rsp.rdram + ((0x2fb1f0 + j * 0xff0 + i) ^ S8)) = *(rsp.imem + ((0x120 + j * 8 + i) ^ S8));
             }
             return Cycles;
             break;
         case 0x9F2: // banjo tooie (E) + zelda oot (E) boot code
             {
                 int i, j;
-                memcpy(rsp.IMEM + 0x120, rsp.RDRAM + 0x1e8, 0x1e8);
+                memcpy(rsp.imem + 0x120, rsp.rdram + 0x1e8, 0x1e8);
                 for (j = 0; j < 0xfc; j++)
                     for (i = 0; i < 8; i++)
-                        *(rsp.RDRAM + ((0x2fb1f0 + j * 0xff0 + i) ^ S8)) = *(rsp.IMEM + ((0x120 + j * 8 + i) ^ S8));
+                        *(rsp.rdram + ((0x2fb1f0 + j * 0xff0 + i) ^ S8)) = *(rsp.imem + ((0x120 + j * 8 + i) ^ S8));
             }
             return Cycles;
             break;
@@ -244,7 +246,7 @@ __declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
             switch (sum)
             {
             case 0x278: // used by zelda during boot
-                *rsp.SP_STATUS_REG |= 0x200;
+                *rsp.sp_status_reg |= 0x200;
                 return Cycles;
                 break;
             case 0x2e4fc: // uncompress
@@ -267,28 +269,28 @@ __declspec(dllexport) uint32_t DoRspCycles(uint32_t Cycles)
     return Cycles;
 }
 
-__declspec(dllexport) void CloseDLL(void)
+EXPORT void CALL CloseDLL(void)
 {
 }
 
-__declspec(dllexport) void GetDllInfo(PLUGIN_INFO* PluginInfo)
+EXPORT void CALL GetDllInfo(core_plugin_info* PluginInfo)
 {
-    PluginInfo->Version = 0x0101;
-    PluginInfo->Type = (int16_t)PluginType::RSP;
-    strcpy(PluginInfo->Name, PLUGIN_NAME);
-    PluginInfo->NormalMemory = 1;
-    PluginInfo->MemoryBswaped = 1;
+    PluginInfo->ver = 0x0101;
+    PluginInfo->type = (int16_t)plugin_rsp;
+    strcpy(PluginInfo->name, PLUGIN_NAME);
+    PluginInfo->unused_normal_memory = 1;
+    PluginInfo->unused_byteswapped = 1;
 }
 
-__declspec(dllexport) void InitiateRSP(RSP_INFO Rsp_Info, uint32_t* CycleCount)
+EXPORT void CALL InitiateRSP(core_rsp_info Rsp_Info, uint32_t* CycleCount)
 {
     rsp = Rsp_Info;
 }
 
-__declspec(dllexport) void RomClosed(void)
+ EXPORT void CALL RomClosed(void)
 {
-    memset(rsp.DMEM, 0, 0x1000);
-    memset(rsp.IMEM, 0, 0x1000);
+    memset(rsp.dmem, 0, 0x1000);
+    memset(rsp.imem, 0, 0x1000);
 
     g_audio_ucode_func = nullptr;
     g_rsp_alive = false;

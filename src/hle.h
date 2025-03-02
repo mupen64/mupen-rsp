@@ -7,8 +7,6 @@
 #ifndef HLE_H
 #define HLE_H
 
-#include "RSP.h"
-
 #ifdef _BIG_ENDIAN
 #define S 0
 #define S8 0
@@ -35,7 +33,7 @@
 #define A_MAIN 0x00
 #define A_MIX 0x10
 
-extern RSP_INFO rsp;
+extern core_rsp_info rsp;
 
 typedef struct
 {

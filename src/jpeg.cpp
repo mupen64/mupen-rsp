@@ -5,7 +5,7 @@
  */
 
 #include "stdafx.h"
-#include "RSP.h"
+#include "core_plugin.h"
 #include "hle.h"
 #include "FrontendService.h"
 
@@ -29,15 +29,15 @@ void jpg_uncompress(OSTask_t* task)
 {
     int i, w;
     short *temp1, *temp2;
-    short* data = (short*)(rsp.RDRAM + task->ucode_data);
+    short* data = (short*)(rsp.rdram + task->ucode_data);
     short m[8 * 32];
 
     if (!task->flags & 1)
     {
-        memcpy(&jpg_data, rsp.RDRAM + task->data_ptr, task->data_size);
-        q[0] = (short*)(rsp.RDRAM + jpg_data.m1);
-        q[1] = (short*)(rsp.RDRAM + jpg_data.m2);
-        q[2] = (short*)(rsp.RDRAM + jpg_data.m3);
+        memcpy(&jpg_data, rsp.rdram + task->data_ptr, task->data_size);
+        q[0] = (short*)(rsp.rdram + jpg_data.m1);
+        q[1] = (short*)(rsp.rdram + jpg_data.m2);
+        q[2] = (short*)(rsp.rdram + jpg_data.m3);
 
         if (jpg_data.h == 0)
         {
@@ -54,7 +54,7 @@ void jpg_uncompress(OSTask_t* task)
     {
         FrontendService::show_error("!flags");
     }
-    pic = (short*)(rsp.RDRAM + jpg_data.pic);
+    pic = (short*)(rsp.rdram + jpg_data.pic);
 
     temp1 = (short*)malloc((jpg_data.h + 4) * 64 * 2);
     temp2 = (short*)malloc((jpg_data.h + 4) * 64 * 2);
@@ -394,7 +394,7 @@ void jpg_uncompress(OSTask_t* task)
         }
         pic += len1 / 2;
     }
-    while (w-- != 1 && !(*rsp.SP_STATUS_REG & 0x80));
+    while (w-- != 1 && !(*rsp.sp_status_reg & 0x80));
 
     pic -= len1 * jpg_data.w / 2;
     free(temp2);

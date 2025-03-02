@@ -7,7 +7,7 @@ http://www.egroups.com/group/Plugin64-Dev
 Notes:
 ------
 
-Setting the approprate bits in the MI_INTR_REG and calling CheckInterrupts which
+Setting the approprate bits in the mi_intr_reg and calling check_interrupts which
 are both passed to the DLL in InitiateAudio will generate an Interrupt from with in
 the plugin.
 
@@ -15,7 +15,7 @@ the plugin.
 #ifndef _AUDIO_H_INCLUDED__
 #define _AUDIO_H_INCLUDED__
 
-#include "RSP.h"
+#include "core_plugin.h"
 
 #if defined(__cplusplus)
 
@@ -128,8 +128,8 @@ EXPORT void CALL GetDllInfo(PLUGIN_INFO* PluginInfo);
             FALSE on failure to initialise
 
   ** note on interrupts **:
-  To generate an interrupt set the appropriate bit in MI_INTR_REG
-  and then call the function CheckInterrupts to tell the emulator
+  To generate an interrupt set the appropriate bit in mi_intr_reg
+  and then call the function check_interrupts to tell the emulator
   that there is a waiting interrupt.
 *******************************************************************/
 EXPORT int32_t CALL InitiateAudio(AUDIO_INFO Audio_Info);
