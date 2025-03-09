@@ -9,7 +9,7 @@
 #define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.3.0"
 
 struct t_config {
-    size_t version = 2;
+    int32_t version = 2;
     /**
      * \brief Whether audio lists are processed externally
      */
