@@ -39,7 +39,7 @@ void (*g_audio_ucode_func)() = nullptr;
  * \param path Path to an audio plugin dll
  * \returns Handle to the audio plugin, or nullptr.
  */
-void* plugin_load(const std::string& path);
+void* plugin_load(const std::filesystem::path& path);
 
 /**
  * \brief Handles unknown RSP tasks.
@@ -287,6 +287,11 @@ EXPORT void CALL InitiateRSP(core_rsp_info Rsp_Info, uint32_t* CycleCount)
     rsp = Rsp_Info;
 }
 
+EXPORT void CALL RomOpen(void)
+{
+    g_config_readonly = true;
+}
+
 EXPORT void CALL RomClosed(void)
 {
     memset(rsp.dmem, 0, 0x1000);
@@ -294,6 +299,7 @@ EXPORT void CALL RomClosed(void)
 
     g_audio_ucode_func = nullptr;
     g_rsp_alive = false;
+    g_config_readonly = false;
 }
 
 EXPORT void CALL GetConfig1(core_plugin_cfg** cfg)

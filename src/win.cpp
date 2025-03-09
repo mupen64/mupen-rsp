@@ -12,6 +12,8 @@
 #include "hle.h"
 #include "win.h"
 
+#include "helpers/io_helpers.h"
+
 extern core_rsp_info rsp;
 extern bool g_rsp_alive;
 
@@ -70,9 +72,9 @@ static uint32_t fake_AI_STATUS_REG;
 static uint32_t fake_AI_DACRATE_REG;
 static uint32_t fake_AI_BITRATE_REG;
 
-void* plugin_load(const std::string& path)
+void* plugin_load(const std::filesystem::path& path)
 {
-    const auto module = LoadLibrary(path.c_str());
+    const auto module = LoadLibrary(path.string().c_str());
 
     if (!module)
     {
@@ -178,7 +180,7 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lP
 
             if (GetOpenFileName(&ofn))
             {
-                strcpy(config.audio_path, path);
+                lstrcpynW(config.audio_path, string_to_wstring(path).c_str(), std::size(config.audio_path));
             }
 
             goto refresh;
@@ -192,7 +194,7 @@ INT_PTR CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lP
 refresh:
     EnableWindow(GetDlgItem(hwnd, IDC_EDIT_AUDIO_PLUGIN), config.audio_external);
     EnableWindow(GetDlgItem(hwnd, IDC_BROWSE_AUDIO_PLUGIN), config.audio_external);
-    SetDlgItemText(hwnd, IDC_EDIT_AUDIO_PLUGIN, config.audio_path);
+    SetDlgItemText(hwnd, IDC_EDIT_AUDIO_PLUGIN, wstring_to_string(config.audio_path).c_str());
 
     return TRUE;
 }

@@ -59,27 +59,27 @@ typedef enum {
     pcit_invalid,
 
     /*
-     * \brief The value is a pointer to <c>bool</c>.
+     * \brief The value contained is of type <c>int32_t</c> and either 0 or 1.
      */
     pcit_bool,
 
     /*
-     * \brief The value is a pointer to <c>int32_t</c>.
+     * \brief The value contained is of type <c>int32_t</c>.
      */
     pcit_int32,
 
     /*
-     * \brief The value is a pointer to <c>int32_t</c>, with a fixed set of allowed values.
+     * \brief The value contained is of type <c>int32_t</c>, with a fixed set of allowed values, as specified by <c>enum_values</c>.
      */
     pcit_enum,
 
     /*
-     * \brief The value is a pointer to <c>wchar_t</c>.
+     * \brief The value contained is of type <c>wchar_t[260]</c>.
      */
     pcit_string,
 
     /*
-     * \brief The value is a pointer to <c>wchar_t</c>, representing a path.
+     * \brief The value contained is of type <c>wchar_t[260]</c>, representing a path.
      */
     pcit_path,
 } core_plugin_cfg_item_type;
@@ -123,6 +123,11 @@ typedef struct {
      */
     const core_plugin_cfg_item_enum_value** enum_values;
 
+    /**
+     * \brief Pointer to a value which specifies whether the item is read-only.
+     */
+    const int32_t* readonly;
+    
     /**
      * \brief Pointer to the item's value. The type of the value pointed to is determined by <c>type</c>.
      * \remark The implementer must guarantee access to this being safe while the emulator is paused.
