@@ -66,7 +66,7 @@ int audio_ucode_detect_type(const OSTask_t* task)
 {
     if (*(unsigned long*)(rsp.rdram + task->ucode_data + 0) != 0x1)
     {
-        if (*(rsp.rdram + task->ucode_data + (0 ^ (3 - S8))) == 0xF)
+        if (*(rsp.rdram + task->ucode_data + (0 ^ 3 - S8)) == 0xF)
             return 4;
         return 3;
     }
@@ -131,7 +131,7 @@ int audio_ucode(OSTask_t* task)
 
     const auto p_alist = (unsigned long*)(rsp.rdram + task->data_ptr);
 
-    for (unsigned int i = 0; i < (task->data_size / 4); i += 2)
+    for (unsigned int i = 0; i < task->data_size / 4; i += 2)
     {
         inst1 = p_alist[i];
         inst2 = p_alist[i + 1];
@@ -158,7 +158,7 @@ EXPORT uint32_t CALL DoRspCycles(uint32_t Cycles)
 
     if (task->type == 1 && task->data_ptr != 0 && config.graphics_hle)
     {
-        if (rsp.process_dlist_list != NULL)
+        if (rsp.process_dlist_list)
         {
             rsp.process_dlist_list();
         }
@@ -172,7 +172,8 @@ EXPORT uint32_t CALL DoRspCycles(uint32_t Cycles)
         *rsp.dpc_status_reg &= ~0x0002;
         return Cycles;
     }
-    else if (task->type == 2 && config.audio_hle)
+
+    if (task->type == 2 && config.audio_hle)
     {
         if (config.audio_external)
             g_processAList();
@@ -188,7 +189,8 @@ EXPORT uint32_t CALL DoRspCycles(uint32_t Cycles)
         }
         return Cycles;
     }
-    else if (task->type == 7)
+
+    if (task->type == 7)
     {
         rsp.show_cfb();
     }
@@ -201,11 +203,15 @@ EXPORT uint32_t CALL DoRspCycles(uint32_t Cycles)
     }
 
     if (task->ucode_size <= 0x1000)
-        for (i = 0; i < (task->ucode_size / 2); i++)
+    {
+        for (i = 0; i < task->ucode_size / 2; i++)
             sum += *(rsp.rdram + task->ucode + i);
+    }
     else
-        for (i = 0; i < (0x1000 / 2); i++)
+        for (i = 0; i < 0x1000 / 2; i++)
+        {
             sum += *(rsp.imem + i);
+        }
 
 
     if (task->ucode_size > 0x1000)
@@ -218,20 +224,18 @@ EXPORT uint32_t CALL DoRspCycles(uint32_t Cycles)
                 memcpy(rsp.imem + 0x120, rsp.rdram + 0x1e8, 0x1e8);
                 for (j = 0; j < 0xfc; j++)
                     for (i = 0; i < 8; i++)
-                        *(rsp.rdram + ((0x2fb1f0 + j * 0xff0 + i) ^ S8)) = *(rsp.imem + ((0x120 + j * 8 + i) ^ S8));
+                        *(rsp.rdram + (0x2fb1f0 + j * 0xff0 + i ^ S8)) = *(rsp.imem + (0x120 + j * 8 + i ^ S8));
             }
             return Cycles;
-            break;
         case 0x9F2: // banjo tooie (E) + zelda oot (E) boot code
             {
                 int i, j;
                 memcpy(rsp.imem + 0x120, rsp.rdram + 0x1e8, 0x1e8);
                 for (j = 0; j < 0xfc; j++)
                     for (i = 0; i < 8; i++)
-                        *(rsp.rdram + ((0x2fb1f0 + j * 0xff0 + i) ^ S8)) = *(rsp.imem + ((0x120 + j * 8 + i) ^ S8));
+                        *(rsp.rdram + (0x2fb1f0 + j * 0xff0 + i ^ S8)) = *(rsp.imem + (0x120 + j * 8 + i ^ S8));
             }
             return Cycles;
-            break;
         }
     }
     else
@@ -248,11 +252,9 @@ EXPORT uint32_t CALL DoRspCycles(uint32_t Cycles)
             case 0x278: // used by zelda during boot
                 *rsp.sp_status_reg |= 0x200;
                 return Cycles;
-                break;
             case 0x2e4fc: // uncompress
                 jpg_uncompress(task);
                 return Cycles;
-                break;
             default:
                 {
                     char s[1024];

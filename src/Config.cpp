@@ -27,11 +27,11 @@ core_plugin_cfg_item cfg_items[] = {
 void config_init()
 {
     g_cfg = {
-        .groups_len = std::size(cfg_groups),
-        .groups = cfg_groups,
-        .items_len = std::size(cfg_items),
-        .items = cfg_items,
-    };    
+    .groups_len = std::size(cfg_groups),
+    .groups = cfg_groups,
+    .items_len = std::size(cfg_items),
+    .items = cfg_items,
+    };
 }
 
 void config_save()
