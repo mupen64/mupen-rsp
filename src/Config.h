@@ -6,7 +6,21 @@
 
 #pragma once
 
-#define PLUGIN_NAME "Mupen64 HLE RSP Plugin 0.3.0"
+#define PLUGIN_VERSION "1.0.0"
+
+#ifdef _M_X64
+#define PLUGIN_ARCH "-x64"
+#else
+#define PLUGIN_ARCH "-x86"
+#endif
+
+#ifdef _DEBUG
+#define PLUGIN_TARGET "-debug"
+#else
+#define PLUGIN_TARGET "-release"
+#endif
+
+#define PLUGIN_NAME "mupen-rsp " PLUGIN_VERSION PLUGIN_ARCH PLUGIN_TARGET
 
 struct t_config {
     int32_t version = 2;
