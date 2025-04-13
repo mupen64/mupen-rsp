@@ -1,4 +1,6 @@
-# hacktarux-azimer-rsp-hle 
+# mupen-rsp
+
+High-performance HLE RSP plugin for Mupen64.
 
 Since this plugin is a critical part of N64 TASing, it has to be given a home somewhere other than floating around as a random dll, along with a maintainer. For any feature or optimization requests, post an issue.
 
