@@ -1,0 +1,19 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Mupen64" type="ShConfigurationType">
+    <option name="SCRIPT_TEXT" value="Copy-Item -Path &quot;build\mupen-rsp-x86-debug.dll&quot; -Destination &quot;..\mupen64-rr-lua-\build\Views.Win32\plugin&quot;; Copy-Item -Path &quot;build\mupen-rsp-x86-release.dll&quot; -Destination &quot;..\mupen64-rr-lua-\build\Views.Win32\plugin&quot;; Stop-Process -Name &quot;mupen64-x86-sse2-release&quot; -Force -ErrorAction SilentlyContinue; Start-Process &quot;..\mupen64-rr-lua-\build\Views.Win32\mupen64-x86-sse2-release.exe&quot;" />
+    <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+    <option name="SCRIPT_PATH" value="" />
+    <option name="SCRIPT_OPTIONS" value="" />
+    <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+    <option name="INTERPRETER_PATH" value="powershell.exe" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="EXECUTE_IN_TERMINAL" value="true" />
+    <option name="EXECUTE_SCRIPT_FILE" value="false" />
+    <envs />
+    <method v="2">
+      <option name="Build" default="false" projectName="mupen-rsp" projectPath="$PROJECT_DIR$/mupen-rsp.vcxproj" />
+    </method>
+  </configuration>
+</component>
