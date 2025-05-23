@@ -9,18 +9,20 @@
 #define PLUGIN_VERSION "1.0.0-rc1"
 
 #ifdef _M_X64
-#define PLUGIN_ARCH "-x64"
+#define PLUGIN_ARCH " x64"
 #else
-#define PLUGIN_ARCH "-x86"
+#define PLUGIN_ARCH " x86"
 #endif
 
 #ifdef _DEBUG
-#define PLUGIN_TARGET "-debug"
+#define PLUGIN_TARGET " Debug"
 #else
-#define PLUGIN_TARGET "-release"
+#define PLUGIN_TARGET " Release"
 #endif
 
-#define PLUGIN_NAME "mupen-rsp " PLUGIN_VERSION PLUGIN_ARCH PLUGIN_TARGET
+#define PLUGIN_ISAEXT " SSE2"
+
+#define PLUGIN_NAME "mupen-rsp " PLUGIN_VERSION PLUGIN_ARCH PLUGIN_ISAEXT PLUGIN_TARGET
 
 struct t_config {
     int32_t version = 2;
