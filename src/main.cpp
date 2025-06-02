@@ -279,7 +279,7 @@ EXPORT void CALL GetDllInfo(core_plugin_info* PluginInfo)
 {
     PluginInfo->ver = 0x0101;
     PluginInfo->type = (int16_t)plugin_rsp;
-    strcpy(PluginInfo->name, PLUGIN_NAME);
+    strncpy(PluginInfo->name, PLUGIN_NAME, std::size(PluginInfo->name));
     PluginInfo->unused_normal_memory = 1;
     PluginInfo->unused_byteswapped = 1;
 }
@@ -302,15 +302,4 @@ EXPORT void CALL RomClosed(void)
     g_audio_ucode_func = nullptr;
     g_rsp_alive = false;
     g_config_readonly = false;
-}
-
-EXPORT void CALL GetConfig1(core_plugin_cfg** cfg)
-{
-    *cfg = &g_cfg;
-}
-
-EXPORT bool CALL SaveConfig1()
-{
-    config_save();
-    return true;
 }

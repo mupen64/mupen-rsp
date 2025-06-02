@@ -18,24 +18,24 @@ extern core_rsp_info rsp;
 extern bool g_rsp_alive;
 
 HINSTANCE g_instance;
-std::string g_app_path;
+std::filesystem::path g_app_path;
 
 // ProcessAList function from audio plugin, only populated when audio_external is true
 void (*g_processAList)() = nullptr;
 
 t_config prev_config = {};
 
-std::string get_app_full_path()
+std::filesystem::path get_app_full_path()
 {
-    char ret[MAX_PATH] = {0};
-    char drive[_MAX_DRIVE], dirn[_MAX_DIR];
-    char path_buffer[_MAX_DIR];
-    GetModuleFileName(nullptr, path_buffer, sizeof(path_buffer));
-    _splitpath(path_buffer, drive, dirn, nullptr, nullptr);
-    strcpy(ret, drive);
-    strcat(ret, dirn);
+    char path[MAX_PATH] = {0};
 
-    return ret;
+    const DWORD len = GetModuleFileNameA(nullptr, path, MAX_PATH);
+    if (len == 0 || len == MAX_PATH)
+    {
+        return {};
+    }
+
+    return path;
 }
 
 
@@ -55,7 +55,6 @@ BOOL APIENTRY DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
         g_instance = hinst;
         g_app_path = get_app_full_path();
         config_load();
-        config_init();
         break;
     default:
         break;
