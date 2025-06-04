@@ -6,7 +6,7 @@
 
 #pragma once
 
-#define PLUGIN_VERSION "1.0.0-rc1"
+#define PLUGIN_VERSION "1.0.0-rc2"
 
 #ifdef _M_X64
 #define PLUGIN_ARCH " x64"
